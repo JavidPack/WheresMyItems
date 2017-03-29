@@ -40,7 +40,7 @@ namespace WheresMyItems
 				{
 					WheresMyItemsUI.box.SetText("");
 					WheresMyItemsUI.box.Unfocus();
-					Main.NewText("Where's My Items search only available while near your town.");
+					//Main.NewText("Where's My Items search only available while near your town.");
 					return;
 				}
 				string searchTerm = WheresMyItemsUI.SearchTerm;
@@ -66,7 +66,7 @@ namespace WheresMyItems
 								message.Write(chestIndex);
 								message.Send();
 								waitingOnContents[chestIndex] = true;
-								Main.NewText($"Wait on {chestIndex}");
+								//Main.NewText($"Wait on {chestIndex}");
 								continue;
 							}
 							// We could technically get item 0 but not item 39, so this check just makes sure we have all the items synced.

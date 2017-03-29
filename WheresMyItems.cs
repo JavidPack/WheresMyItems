@@ -62,7 +62,7 @@ namespace WheresMyItems
 			{
 				case MessageType.SilentRequestChestContents:
 					int chestIndex = reader.ReadInt32();
-					System.Console.WriteLine($"Request for {chestIndex}");
+					//System.Console.WriteLine($"Request for {chestIndex}");
 					if (chestIndex > -1)
 					{
 						for (int i = 0; i < 40; i++)
@@ -71,7 +71,7 @@ namespace WheresMyItems
 						}
 						var message = GetPacket();
 						message.Write((byte)MessageType.SilentSendChestContentsComplete);
-						System.Console.WriteLine($"Request for {chestIndex} complete");
+						//System.Console.WriteLine($"Request for {chestIndex} complete");
 						message.Write(chestIndex);
 						message.Send(whoAmI);
 					}
@@ -79,7 +79,7 @@ namespace WheresMyItems
 				case MessageType.SilentSendChestContentsComplete:
 					int completedChestindex = reader.ReadInt32();
 					WheresMyItemsPlayer.waitingOnContents[completedChestindex] = false;
-					Main.NewText($"Complete on {completedChestindex}");
+					//Main.NewText($"Complete on {completedChestindex}");
 					break;
 				default:
 					//DebugText("Unknown Message type: " + msgType);
