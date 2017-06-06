@@ -81,7 +81,7 @@ namespace WheresMyItems
 							Item[] items = chest.item;
 							for (int i = 0; i < 40; i++)
 							{
-								if (items[i].name.ToLower().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) != -1)
+								if (items[i].Name.ToLower().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) != -1)
 								{
 									found = true;
 									break;

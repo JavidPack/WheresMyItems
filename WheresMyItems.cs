@@ -33,12 +33,12 @@ namespace WheresMyItems
 			}
 		}
 
-		public override void ModifyInterfaceLayers(List<MethodSequenceListItem> layers)
+		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
 		{
 			int vanillaInventoryLayerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
 			if (vanillaInventoryLayerIndex != -1)
 			{
-				layers.Insert(vanillaInventoryLayerIndex + 1, new MethodSequenceListItem(
+				layers.Insert(vanillaInventoryLayerIndex + 1, new LegacyGameInterfaceLayer(
 					"WheresMyItems: Smart Quick Stack",
 					delegate
 					{
@@ -49,7 +49,7 @@ namespace WheresMyItems
 						}
 						return true;
 					},
-					null)
+					InterfaceScaleType.UI)
 				);
 			}
 		}
@@ -67,7 +67,7 @@ namespace WheresMyItems
 					{
 						for (int i = 0; i < 40; i++)
 						{
-							NetMessage.SendData(32, whoAmI, -1, "", chestIndex, (float)i, 0f, 0f, 0, 0, 0);
+							NetMessage.SendData(32, whoAmI, -1, null, chestIndex, (float)i, 0f, 0f, 0, 0, 0);
 						}
 						var message = GetPacket();
 						message.Write((byte)MessageType.SilentSendChestContentsComplete);
