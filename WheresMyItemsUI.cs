@@ -10,7 +10,7 @@ namespace WheresMyItems
 {
 	class WheresMyItemsUI : UIState
 	{
-		public UIPanel coinCounterPanel;
+		public UIPanel searchBarPanel;
 		public static bool visible = false;
 		public static NewUITextBox box;
 
@@ -21,24 +21,24 @@ namespace WheresMyItems
 
 		public override void OnInitialize()
 		{
-			coinCounterPanel = new UIPanel();
-			coinCounterPanel.SetPadding(0);
-			//coinCounterPanel.Left.Set(0, .5f);
-			//coinCounterPanel.Top.Set(0, .5f);
-			coinCounterPanel.Top.Set(50, 0f);
-			coinCounterPanel.HAlign = 0.5f;
-			coinCounterPanel.VAlign = 0.5f;
-			coinCounterPanel.Width.Set(170f, 0f);
-			coinCounterPanel.Height.Set(30f, 0f);
-			coinCounterPanel.BackgroundColor = new Color(73, 94, 171);
-			coinCounterPanel.OnMouseDown += DragStart;
-			coinCounterPanel.OnMouseUp += DragEnd;
+			searchBarPanel = new UIPanel();
+			searchBarPanel.SetPadding(0);
+			//searchBarPanel.Left.Set(0, .5f);
+			//searchBarPanel.Top.Set(0, .5f);
+			searchBarPanel.Top.Set(50, 0f);
+			searchBarPanel.HAlign = 0.5f;
+			searchBarPanel.VAlign = 0.5f;
+			searchBarPanel.Width.Set(170f, 0f);
+			searchBarPanel.Height.Set(30f, 0f);
+			searchBarPanel.BackgroundColor = new Color(73, 94, 171);
+			searchBarPanel.OnMouseDown += DragStart;
+			searchBarPanel.OnMouseUp += DragEnd;
 
 			Texture2D buttonPlayTexture = ModLoader.GetTexture("Terraria/UI/Cursor_2");
 			UIImage playButton = new UIImage(buttonPlayTexture);
 			playButton.Left.Set(5, 0f);
 			playButton.Top.Set(5, 0f);
-			coinCounterPanel.Append(playButton);
+			searchBarPanel.Append(playButton);
 
 			box = new NewUITextBox("Type here to search", 0.78f);
 			box.BackgroundColor = Color.Transparent;
@@ -47,10 +47,10 @@ namespace WheresMyItems
 			box.Top.Pixels = -5;
 			box.MinWidth.Pixels = 120;
 			box.OnUnfocus += () => visible = false;
+            searchBarPanel.Append(box);
 
-			coinCounterPanel.Append(box);
 
-			Append(coinCounterPanel);
+			Append(searchBarPanel);
 		}
 
 		private void PlayButtonClicked(UIMouseEvent evt, UIElement listeningElement)
@@ -69,7 +69,7 @@ namespace WheresMyItems
 		public static bool dragging = false;
 		private void DragStart(UIMouseEvent evt, UIElement listeningElement)
 		{
-			offset = new Vector2(evt.MousePosition.X - coinCounterPanel.Left.Pixels, evt.MousePosition.Y - coinCounterPanel.Top.Pixels);
+			offset = new Vector2(evt.MousePosition.X - searchBarPanel.Left.Pixels, evt.MousePosition.Y - searchBarPanel.Top.Pixels);
 			dragging = true;
 		}
 
@@ -78,8 +78,8 @@ namespace WheresMyItems
 			Vector2 end = evt.MousePosition;
 			dragging = false;
 
-			coinCounterPanel.Left.Set(end.X - offset.X, 0f);
-			coinCounterPanel.Top.Set(end.Y - offset.Y, 0f);
+			searchBarPanel.Left.Set(end.X - offset.X, 0f);
+			searchBarPanel.Top.Set(end.Y - offset.Y, 0f);
 
 			Recalculate();
 		}
@@ -87,14 +87,14 @@ namespace WheresMyItems
 		protected override void DrawSelf(SpriteBatch spriteBatch)
 		{
 			Vector2 MousePosition = new Vector2((float)Main.mouseX, (float)Main.mouseY);
-			if (coinCounterPanel.ContainsPoint(MousePosition))
+			if (searchBarPanel.ContainsPoint(MousePosition))
 			{
 				Main.LocalPlayer.mouseInterface = true;
 			}
 			if (dragging)
 			{
-				coinCounterPanel.Left.Set(MousePosition.X - offset.X, 0f);
-				coinCounterPanel.Top.Set(MousePosition.Y - offset.Y, 0f);
+				searchBarPanel.Left.Set(MousePosition.X - offset.X, 0f);
+				searchBarPanel.Top.Set(MousePosition.Y - offset.Y, 0f);
 				Recalculate();
 			}
 		}
