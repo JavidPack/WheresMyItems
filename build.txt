@@ -1,4 +1,4 @@
-﻿author = jopojelly
+﻿author = jopojelly, alienmist325
 version = 0.2.1
 displayName = Where's My Items
 homepage = https://forums.terraria.org/index.php?threads/wheres-my-items.55451/
