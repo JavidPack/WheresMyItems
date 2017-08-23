@@ -57,10 +57,9 @@ namespace WheresMyItems
 
         public void NewDustSlowed(Vector2 pos,int w, int h,int type,int interval)
         {
-            Point tPos = pos.ToTileCoordinates();
             if (gameCounter % interval == 0)
             {
-                
+                Dust.NewDust(pos, w, h, type);
             }
         }
 
@@ -93,7 +92,7 @@ namespace WheresMyItems
                 pos[0] = plTopCenter + new Vector2(-48, -32);
                 pos[1] = plTopCenter + new Vector2(0, -32);
                 pos[2] = plTopCenter + new Vector2(48, -32);
-                
+
                 for (int i = 0; i < 3; i++)
                 {
                     Main.spriteBatch.Draw(box, CreateRect(pos[i] - HalfSize(box), box), Color.White);
@@ -142,7 +141,7 @@ namespace WheresMyItems
                             //}
                             if (TestForItem(chest,searchTerm))
                             {
-                                NewDustSlowed(new Vector2(chest.x * 16, chest.y * 16), 32, 32, 16,10); //107
+                                NewDustSlowed(new Vector2(chest.x * 16, chest.y * 16), 32, 32, 107,10);
                             }
                         }
                     }
@@ -166,7 +165,7 @@ namespace WheresMyItems
                     }
                     if (TestForItem(bk, searchTerm))
                     {
-                        NewDustSlowed(pos[i] + Main.screenPosition, 1, 1, 16,30); //used to be 6 //188
+                        NewDustSlowed(pos[i] + Main.screenPosition, 1, 1, 107,30); //used to be 6
                     }
                 }
 			}
