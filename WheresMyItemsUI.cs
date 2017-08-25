@@ -47,7 +47,7 @@ namespace WheresMyItems
 			box.Top.Pixels = -5;
 			box.MinWidth.Pixels = 120;
 			box.OnUnfocus += () => visible = false;
-            searchBarPanel.Append(box);
+			searchBarPanel.Append(box);
 
 
 			Append(searchBarPanel);
