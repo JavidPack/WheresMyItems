@@ -1,23 +1,24 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using Terraria.GameContent.UI.Elements;
-using Terraria.UI;
-using Terraria;
-using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Graphics;
+using System;
+using Terraria;
+using Terraria.GameContent.UI.Elements;
+using Terraria.UI;
 
 namespace WheresMyItems
 {
 	// NewUITextBox is a WIP that may make it into tmodloader proper.
-	class NewUITextBox : UITextPanel<string>
+	internal class NewUITextBox : UITextPanel<string>
 	{
-		bool focused = false;
+		private bool focused = false;
 		private int _cursor;
 		private int _frameCount;
 		private int _maxLength = 30;
 		private string hintText;
+
 		public event Action OnFocus;
+
 		public event Action OnUnfocus;
 
 		public NewUITextBox(string text, float textScale = 1, bool large = false) : base("", textScale, large)
@@ -32,7 +33,7 @@ namespace WheresMyItems
 			base.Click(evt);
 		}
 
-		void KeyboardInput_newKeyEvent(char obj)
+		private void KeyboardInput_newKeyEvent(char obj)
 		{
 			// Problem: keyBoardInput.newKeyEvent only fires on regular keyboard buttons.
 
@@ -46,7 +47,7 @@ namespace WheresMyItems
 			//	Unfocus();
 			//	Main.chatRelease = false;
 			//}
-			//else 
+			//else
 			if (Char.IsLetterOrDigit(obj))
 			{
 				if (Char.IsDigit(obj))
@@ -148,6 +149,7 @@ namespace WheresMyItems
 		}
 
 		internal int counter = 0;
+
 		protected override void DrawSelf(SpriteBatch spriteBatch)
 		{
 			counter++;
@@ -158,7 +160,7 @@ namespace WheresMyItems
 				SetText(Main.GetInputText(Text));
 				//Main.keyCount = 0;
 			}
-			if (counter>5 && WheresMyItems.RandomBuffHotKey.JustPressed)
+			if (counter > 5 && WheresMyItems.RandomBuffHotKey.JustPressed)
 			{
 				Unfocus();
 			}
@@ -246,4 +248,3 @@ namespace WheresMyItems
 		}
 	}
 }
-

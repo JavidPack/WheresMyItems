@@ -1,14 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.ModLoader;
 using Terraria.GameContent.UI.Elements;
-using Terraria.UI;
 using Terraria.ID;
+using Terraria.ModLoader;
+using Terraria.UI;
 
 namespace WheresMyItems
 {
-	class WheresMyItemsUI : UIState
+	internal class WheresMyItemsUI : UIState
 	{
 		public UIPanel searchBarPanel;
 		public static bool visible = false;
@@ -49,7 +49,6 @@ namespace WheresMyItems
 			box.OnUnfocus += () => visible = false;
 			searchBarPanel.Append(box);
 
-
 			Append(searchBarPanel);
 		}
 
@@ -65,8 +64,10 @@ namespace WheresMyItems
 		}
 
 		// Drag support
-		Vector2 offset;
+		private Vector2 offset;
+
 		public static bool dragging = false;
+
 		private void DragStart(UIMouseEvent evt, UIElement listeningElement)
 		{
 			offset = new Vector2(evt.MousePosition.X - searchBarPanel.Left.Pixels, evt.MousePosition.Y - searchBarPanel.Top.Pixels);

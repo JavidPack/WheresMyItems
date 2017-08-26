@@ -2,6 +2,6 @@
 version = 0.2.1
 displayName = Where's My Items
 homepage = https://forums.terraria.org/index.php?threads/wheres-my-items.55451/
-buildIgnore = .vs\*, Properties\*, *.csproj, *.user, obj\*, bin\*, *.config, extracode.txt
+buildIgnore = .vs\*, Properties\*, *.csproj, *.user, obj\*, bin\*, *.config, extracode.txt, .git\*, .gitignore, .gitattributes
 includePDB = true
 languageVersion = 6

@@ -1,9 +1,8 @@
-﻿using Terraria.ModLoader;
-using Terraria;
-using Terraria.UI;
-using System.Collections.Generic;
-using Terraria.DataStructures;
+﻿using System.Collections.Generic;
 using System.IO;
+using Terraria;
+using Terraria.ModLoader;
+using Terraria.UI;
 
 namespace WheresMyItems
 {
@@ -33,6 +32,11 @@ namespace WheresMyItems
 			}
 		}
 
+		public override void Unload()
+		{
+			RandomBuffHotKey = null;
+		}
+
 		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
 		{
 			int vanillaInventoryLayerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
@@ -53,7 +57,6 @@ namespace WheresMyItems
 				);
 			}
 		}
-
 
 		public override void HandlePacket(BinaryReader reader, int whoAmI)
 		{
@@ -76,11 +79,13 @@ namespace WheresMyItems
 						message.Send(whoAmI);
 					}
 					break;
+
 				case MessageType.SilentSendChestContentsComplete:
 					int completedChestindex = reader.ReadInt32();
 					WheresMyItemsPlayer.waitingOnContents[completedChestindex] = false;
 					//Main.NewText($"Complete on {completedChestindex}");
 					break;
+
 				default:
 					//DebugText("Unknown Message type: " + msgType);
 					break;
@@ -88,16 +93,17 @@ namespace WheresMyItems
 		}
 	}
 
-	enum MessageType : byte
+	internal enum MessageType : byte
 	{
 		/// <summary>
-		/// Vanilla client sends 31 to server, getting 32s, 33, and 80 in response, also claiming the chest open. 
-		/// We don't want that, so we'll do an alternate version of that 
+		/// Vanilla client sends 31 to server, getting 32s, 33, and 80 in response, also claiming the chest open.
+		/// We don't want that, so we'll do an alternate version of that
 		/// 32 for each item -- Want
 		/// We don't want 33 -- Syncs name, make noise.
 		/// We don't want 80 -- informs others that the chest is open
 		/// </summary>
 		SilentRequestChestContents,
+
 		/// <summary>
 		/// Once the 40 items are sent, send this packet so we don't have to wait anymore
 		/// </summary>

@@ -1,11 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria.UI;
-using System.Collections.Generic;
 
 namespace WheresMyItems
 {
@@ -13,9 +12,9 @@ namespace WheresMyItems
 	public class WheresMyItemsPlayer : ModPlayer
 	{
 		internal static bool[] waitingOnContents = new bool[1000];
-		const int itemSearchRange = 400;
-		int gameCounter;
-		Item[] curInv;
+		private const int itemSearchRange = 400;
+		private int gameCounter;
+		private Item[] curInv;
 
 		public override void ProcessTriggers(TriggersSet triggersSet)
 		{
@@ -30,7 +29,7 @@ namespace WheresMyItems
 				}
 				// Since Main.blockInput, not called.
 				//else
-				//{ 
+				//{
 				//						WheresMyItemsUI.box.SetText("");
 				//	WheresMyItemsUI.box.Unfocus();
 				//}
@@ -55,7 +54,7 @@ namespace WheresMyItems
 					inv[found] = items[i];
 					if (i > 0)
 					{
-						if (items[i].type == items[i-1].type)
+						if (items[i].type == items[i - 1].type)
 						{
 							found--;
 						}
@@ -65,23 +64,22 @@ namespace WheresMyItems
 					{
 						break;
 					}
-					
 				}
 			}
 			nInv = inv;
 			return found > 0;
 		}
 
-		public void NewDustSlowed(Vector2 pos,int w, int h,int type,int interval)
+		public void NewDustSlowed(Vector2 pos, int w, int h, int type, int interval)
 		{
 			Point tPos = pos.ToTileCoordinates();
 			if (gameCounter % interval == 0)
 			{
-				int d = Dust.NewDust(pos, w, h, type,0f,0f,0, Color.White, 0.9f);
+				int d = Dust.NewDust(pos, w, h, type, 0f, 0f, 0, Color.White, 0.9f);
 			}
 		}
 
-		public Vector2 HalfSize(Texture2D t,float scale)
+		public Vector2 HalfSize(Texture2D t, float scale)
 		{
 			return new Vector2(t.Width * scale / 2, t.Height * scale / 2);
 		}
@@ -91,12 +89,12 @@ namespace WheresMyItems
 			return new Rectangle((int)v.X, (int)v.Y, t.Width, t.Height);
 		}
 
-		public void DrawSlot(Vector2 cPos,Texture2D item, Texture2D box, float scale, Color colour)
+		public void DrawSlot(Vector2 cPos, Texture2D item, Texture2D box, float scale, Color colour)
 		{
 			//Main.spriteBatch.Draw(box, CreateRect(cPos - HalfSize(box), box), CreateRect(Vector2.Zero,box), Color.White,0f,Vector2.Zero,scale ,SpriteEffects.None,0);
 			//Main.spriteBatch.Draw(item, CreateRect(cPos - HalfSize(item), item), CreateRect(Vector2.Zero, item), Color.White, 0f,Vector2.Zero,scale, SpriteEffects.None,0);
-			Main.spriteBatch.Draw(box, cPos - HalfSize(box,scale), CreateRect(Vector2.Zero,box), colour,0f,Vector2.Zero,scale ,SpriteEffects.None,0);
-			Main.spriteBatch.Draw(item, cPos - HalfSize(item,scale), CreateRect(Vector2.Zero, item), Color.White, 0f,Vector2.Zero,scale, SpriteEffects.None,0);
+			Main.spriteBatch.Draw(box, cPos - HalfSize(box, scale), CreateRect(Vector2.Zero, box), colour, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+			Main.spriteBatch.Draw(item, cPos - HalfSize(item, scale), CreateRect(Vector2.Zero, item), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
 		}
 
 		public override void ModifyDrawLayers(List<PlayerLayer> layers)
@@ -123,10 +121,10 @@ namespace WheresMyItems
 				pos[0] = plTopCenter + new Vector2(-48, -32);
 				pos[1] = plTopCenter + new Vector2(0, -32);
 				pos[2] = plTopCenter + new Vector2(48, -32);
-				
+
 				for (int i = 0; i < 3; i++)
 				{
-					DrawSlot(pos[i], bank[i], box,1f, Color.White);
+					DrawSlot(pos[i], bank[i], box, 1f, Color.White);
 				}
 				//Main.NewText(Main.player[Main.myPlayer].chest.ToString());
 				/*if (player.townNPCs < 1f)
@@ -152,7 +150,6 @@ namespace WheresMyItems
 						{
 							if (chest.item[0] == null)
 							{
-
 								var message = mod.GetPacket();
 								message.Write((byte)MessageType.SilentRequestChestContents);
 								message.Write(chestIndex);
@@ -161,7 +158,7 @@ namespace WheresMyItems
 								//Main.NewText($"Wait on {chestIndex}");
 								continue;
 							}
-							
+
 							// We could technically get item 0 but not item 39, so this check just makes sure we have all the items synced.
 							//if (chest.item[chest.item.Length - 1] == null)
 							//{
@@ -169,11 +166,10 @@ namespace WheresMyItems
 							//	waitTimes[chestIndex] = 10;
 							//	continue;
 							//}
-							if (TestForItem(chest,searchTerm, ref curInv))
+							if (TestForItem(chest, searchTerm, ref curInv))
 							{
-								
 								Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
-								Rectangle chestArea = new Rectangle(chest.x*16, chest.y*16, 32, 32);
+								Rectangle chestArea = new Rectangle(chest.x * 16, chest.y * 16, 32, 32);
 								Vector2[] hoverPos = new Vector2[3];
 								Texture2D[] itemT = new Texture2D[3];
 
@@ -185,7 +181,7 @@ namespace WheresMyItems
 								{
 									for (int i = 0; i < 3; i++)
 									{
-										if(curInv[i] != null)
+										if (curInv[i] != null)
 										{
 											if (curInv[i].type > Main.itemTexture.Length)
 											{
@@ -195,35 +191,37 @@ namespace WheresMyItems
 											{
 												itemT[i] = Main.itemTexture[curInv[i].type];
 											}
-											DrawSlot(hoverPos[i], itemT[i], box,1f,Color.Red);
+											DrawSlot(hoverPos[i], itemT[i], box, 1f, Color.Red);
 										}
 									}
 								}
-								NewDustSlowed(new Vector2(chest.x * 16, chest.y * 16), 32, 32, 16,10); //107
+								NewDustSlowed(new Vector2(chest.x * 16, chest.y * 16), 32, 32, 16, 10); //107
 							}
 						}
 					}
 				}
 				// deal with extra invens
-				
+
 				Chest bk;
 				for (int i = 0; i < 3; i++)
 				{
-					switch(i)
+					switch (i)
 					{
 						case 1:
 							bk = player.bank2;
 							break;
+
 						case 2:
 							bk = player.bank3;
 							break;
+
 						default:
 							bk = player.bank;
 							break;
 					}
 					if (TestForItem(bk, searchTerm, ref curInv))
 					{
-						NewDustSlowed(pos[i] + Main.screenPosition, 1, 1, 16,30); //used to be 6 //188
+						NewDustSlowed(pos[i] + Main.screenPosition, 1, 1, 16, 30); //used to be 6 //188
 					}
 				}
 			}
