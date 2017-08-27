@@ -20,12 +20,6 @@ namespace WheresMyItems
 		private float sc = 0.8f;
 		public static bool hover;
 
-		public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genGore, ref PlayerDeathReason damageSource)
-		{
-			WheresMyItemsUI.visible = false;
-			return base.PreKill(damage, hitDirection, pvp, ref playSound, ref genGore, ref damageSource);
-		}
-
 		public override void ProcessTriggers(TriggersSet triggersSet)
 		{
 			if (WheresMyItems.RandomBuffHotKey.JustPressed)
