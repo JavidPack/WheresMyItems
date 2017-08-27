@@ -12,12 +12,11 @@ namespace WheresMyItems
 		internal WheresMyItemsUI wheresMyItemsUI;
 		public static ModHotKey RandomBuffHotKey;
 
+		int lastSeenScreenWidth;
+		int lastSeenScreenHeight;
+
 		public WheresMyItems()
 		{
-			Properties = new ModProperties()
-			{
-				Autoload = true,
-			};
 		}
 
 		public override void Load()
@@ -42,12 +41,18 @@ namespace WheresMyItems
 			int vanillaInventoryLayerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
 			if (vanillaInventoryLayerIndex != -1)
 			{
-				layers.Insert(vanillaInventoryLayerIndex + 1, new LegacyGameInterfaceLayer(
-					"WheresMyItems: Smart Quick Stack",
+				layers.Insert(vanillaInventoryLayerIndex, new LegacyGameInterfaceLayer(
+					"WheresMyItems: Quick Search",
 					delegate
 					{
 						if (WheresMyItemsUI.visible)
 						{
+							if (lastSeenScreenWidth != Main.screenWidth || lastSeenScreenHeight != Main.screenHeight)
+							{
+								wheresMyItemsUserInterface.Recalculate();
+								lastSeenScreenWidth = Main.screenWidth;
+								lastSeenScreenHeight = Main.screenHeight;
+							}
 							wheresMyItemsUserInterface.Update(Main._drawInterfaceGameTime);
 							wheresMyItemsUI.Draw(Main.spriteBatch);
 						}

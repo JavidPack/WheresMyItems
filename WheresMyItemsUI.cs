@@ -15,7 +15,7 @@ namespace WheresMyItems
 		public UIPanel searchBarPanel;
 		public static bool visible = false;
 		public static NewUITextBox box;
-		public static List<DrawData[]> l = new List<DrawData[]> { };
+		public static List<DrawData[]> worldZoomDrawDatas = new List<DrawData[]>();
 
 		public static string SearchTerm
 		{
@@ -38,7 +38,7 @@ namespace WheresMyItems
 			searchBarPanel.OnMouseUp += DragEnd;
 
 			Texture2D buttonPlayTexture = ModLoader.GetTexture("Terraria/UI/Cursor_2");
-			UIImage playButton = new UIImage(buttonPlayTexture);
+			UIHoverImageButton playButton = new UIHoverImageButton(buttonPlayTexture, "Click to switch peek modes: Show All");
 			playButton.Left.Set(5, 0f);
 			playButton.Top.Set(5, 0f);
 			playButton.OnClick += TogHover;
@@ -91,7 +91,9 @@ namespace WheresMyItems
 
 		private void TogHover(UIMouseEvent evt, UIElement listeningElement)
 		{
+			UIHoverImageButton button = (evt.Target as UIHoverImageButton);
 			WheresMyItemsPlayer.hover = !WheresMyItemsPlayer.hover;
+			button.hoverText = "Click to switch peek modes: Show " + (WheresMyItemsPlayer.hover ? "Hovered" : "All");
 		}
 
 		protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -112,10 +114,16 @@ namespace WheresMyItems
 		public override void Draw(SpriteBatch spriteBatch)
 		{
 			base.Draw(spriteBatch);
-			for (int i = 0; i < l.Count; i++)
+
+			Main.spriteBatch.End();
+			Terraria.GameInput.PlayerInput.SetZoom_World();
+			Matrix transformMatrix = Main.GameViewMatrix.ZoomMatrix;
+			Main.spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, transformMatrix);
+
+			for (int i = 0; i < worldZoomDrawDatas.Count; i++)
 			{
-				l[i][0].Draw(spriteBatch);
-				l[i][1].Draw(spriteBatch);
+				worldZoomDrawDatas[i][0].Draw(spriteBatch);
+				worldZoomDrawDatas[i][1].Draw(spriteBatch);
 			}
 		}
 	}

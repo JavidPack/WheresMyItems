@@ -7,7 +7,6 @@ using Terraria.GameInput;
 using Terraria.ModLoader;
 using Terraria.DataStructures;
 
-
 namespace WheresMyItems
 {
 	//draw problems > check position
@@ -42,8 +41,8 @@ namespace WheresMyItems
 
 		public bool ChestWithinRange(Chest c, int range)
 		{
-			Vector2 distanceToPlayer = new Vector2((c.x * 16 + 16), (c.y * 16 + 16));
-			return (distanceToPlayer - player.Center).Length() < range;
+			Vector2 chestCenter = new Vector2((c.x * 16 + 16), (c.y * 16 + 16));
+			return (chestCenter - player.Center).Length() < range;
 		}
 
 		public int TestForItem(Chest c, string searchTerm, ref Item[] nInv)
@@ -59,7 +58,7 @@ namespace WheresMyItems
 				}
 				if (items[i].Name.ToLower().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) != -1)
 				{
-					inv[found] = items[i];
+					inv[found] = items[i].Clone();
 					if (found > 0)
 					{
 						if (inv[found].type == inv[found - 1].type)
@@ -108,14 +107,14 @@ namespace WheresMyItems
 
 		public override void DrawEffects(PlayerDrawInfo drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
 		{
-			gameCounter++;
-			if (gameCounter == 99999)
-			{
-				gameCounter = 0;
-			}
-			WheresMyItemsUI.l = new List<DrawData[]> { };
 			if (WheresMyItemsUI.visible && player == Main.LocalPlayer)
 			{
+				gameCounter++;
+				if (gameCounter == 99999)
+				{
+					gameCounter = 0;
+				}
+				WheresMyItemsUI.worldZoomDrawDatas.Clear();
 
 				Texture2D[] bank = new Texture2D[3];
 				Vector2[] pos = new Vector2[3];
@@ -130,7 +129,7 @@ namespace WheresMyItems
 
 				for (int i = 0; i < 3; i++)
 				{
-					WheresMyItemsUI.l.Add(DrawDataSlot(pos[i], bank[i], box, 1f, Color.White));
+					WheresMyItemsUI.worldZoomDrawDatas.Add(DrawDataSlot(pos[i], bank[i], box, 1f, Color.White));
 				}
 				//Main.NewText(Main.player[Main.myPlayer].chest.ToString());
 				/*if (player.townNPCs < 1f)
@@ -189,33 +188,24 @@ namespace WheresMyItems
 									// hover check
 									if (!chestArea.Contains(mousePosition.ToPoint()))
 									{
-
 										continue;
 									}
-									Main.NewText(no.ToString());
 								}
 								else
 								{
 									peekPos[1] = chestArea.Center.ToVector2() - Main.screenPosition;
 								}
-								peekPos[1] += new Vector2(3, 4);
+								//peekPos[1] += new Vector2(3, 4);
 								// I'm not too sure why, but without this displacement, the peek box is slightly off center
 								peekPos[0] = peekPos[1] - new Vector2(0, 48 * sc);
 								peekPos[2] = peekPos[1] + new Vector2(0, 48 * sc);
 								for (int i = 0; i < 3; i++)
 								{
 									peekPos[i] += new Vector2(0, sc * 24 * (3 - no));
-									if (curInv[i] != null)
+									if (curInv[i] != null && !curInv[i].IsAir)
 									{
-										if (curInv[i].type > Main.itemTexture.Length)
-										{
-											itemT[i] = curInv[i].modItem.mod.GetTexture(curInv[i].modItem.Texture);
-										}
-										else
-										{
-											itemT[i] = Main.itemTexture[curInv[i].type];
-										}
-										WheresMyItemsUI.l.Add(DrawDataSlot(peekPos[i], itemT[i], box, sc, Color.Red));
+										itemT[i] = Main.itemTexture[curInv[i].type];
+										WheresMyItemsUI.worldZoomDrawDatas.Add(DrawDataSlot(peekPos[i], itemT[i], box, sc, Color.Red));
 									}
 								}
 							}
@@ -242,7 +232,40 @@ namespace WheresMyItems
 					}
 					if (TestForItem(bk, searchTerm, ref curInv) > 0)
 					{
-						NewDustSlowed(pos[i] + Main.screenPosition, 1, 1, 16, 30); //used to be 6 //188
+						NewDustSlowed(pos[i] + Main.screenPosition, 1, 1, 16, 30);
+						pos[i].X -= 16;
+						pos[i].Y -= 16;
+						Vector2 hoverCorner = pos[i] + Main.screenPosition;
+						Rectangle chestArea = new Rectangle((int)hoverCorner.X, (int)hoverCorner.Y, 32, 32);
+						Vector2[] peekPos = new Vector2[3];
+						Texture2D[] itemT = new Texture2D[3];
+						if (hover)
+						{
+							// TODO, scale correctly
+							Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
+							peekPos[0] = mousePosition - Main.screenPosition;
+							//peekPos[0].X -= 16;
+							if (!chestArea.Contains(mousePosition.ToPoint()))
+							{
+								continue;
+							}
+						}
+						else
+						{
+							peekPos[0] = chestArea.Center.ToVector2() - Main.screenPosition;
+							//peekPos[0].X -= 16;
+						}
+						peekPos[1] = peekPos[0] - new Vector2(0, 48 * sc);
+						peekPos[2] = peekPos[1] - new Vector2(0, 48 * sc);
+						for (int j = 0; j < 3; j++)
+						{
+							//peekPos[j] += new Vector2(0, sc * 24);
+							if (curInv[j] != null && !curInv[j].IsAir)
+							{
+								itemT[j] = Main.itemTexture[curInv[j].type];
+								WheresMyItemsUI.worldZoomDrawDatas.Add(DrawDataSlot(peekPos[j], itemT[j], box, sc, Color.Red));
+							}
+						}
 					}
 				}
 			}
