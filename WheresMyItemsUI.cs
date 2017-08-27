@@ -5,6 +5,8 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
+using System.Collections.Generic;
+using Terraria.DataStructures;
 
 namespace WheresMyItems
 {
@@ -13,6 +15,7 @@ namespace WheresMyItems
 		public UIPanel searchBarPanel;
 		public static bool visible = false;
 		public static NewUITextBox box;
+		public static List<DrawData[]> l = new List<DrawData[]> { };
 
 		public static string SearchTerm
 		{
@@ -38,6 +41,7 @@ namespace WheresMyItems
 			UIImage playButton = new UIImage(buttonPlayTexture);
 			playButton.Left.Set(5, 0f);
 			playButton.Top.Set(5, 0f);
+			playButton.OnClick += TogHover;
 			searchBarPanel.Append(playButton);
 
 			box = new NewUITextBox("Type here to search", 0.78f);
@@ -85,6 +89,11 @@ namespace WheresMyItems
 			Recalculate();
 		}
 
+		private void TogHover(UIMouseEvent evt, UIElement listeningElement)
+		{
+			WheresMyItemsPlayer.hover = !WheresMyItemsPlayer.hover;
+		}
+
 		protected override void DrawSelf(SpriteBatch spriteBatch)
 		{
 			Vector2 MousePosition = new Vector2((float)Main.mouseX, (float)Main.mouseY);
@@ -97,6 +106,16 @@ namespace WheresMyItems
 				searchBarPanel.Left.Set(MousePosition.X - offset.X, 0f);
 				searchBarPanel.Top.Set(MousePosition.Y - offset.Y, 0f);
 				Recalculate();
+			}
+		}
+
+		public override void Draw(SpriteBatch spriteBatch)
+		{
+			base.Draw(spriteBatch);
+			for (int i = 0; i < l.Count; i++)
+			{
+				l[i][0].Draw(spriteBatch);
+				l[i][1].Draw(spriteBatch);
 			}
 		}
 	}

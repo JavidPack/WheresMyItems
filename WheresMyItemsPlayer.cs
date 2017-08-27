@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
+using Terraria.DataStructures;
+
 
 namespace WheresMyItems
 {
@@ -15,6 +17,14 @@ namespace WheresMyItems
 		private const int itemSearchRange = 400;
 		private int gameCounter;
 		private Item[] curInv;
+		private float sc = 0.8f;
+		public static bool hover;
+
+		public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genGore, ref PlayerDeathReason damageSource)
+		{
+			WheresMyItemsUI.visible = false;
+			return base.PreKill(damage, hitDirection, pvp, ref playSound, ref genGore, ref damageSource);
+		}
 
 		public override void ProcessTriggers(TriggersSet triggersSet)
 		{
@@ -42,20 +52,25 @@ namespace WheresMyItems
 			return (distanceToPlayer - player.Center).Length() < range;
 		}
 
-		public bool TestForItem(Chest c, string searchTerm, ref Item[] nInv)
+		public int TestForItem(Chest c, string searchTerm, ref Item[] nInv)
 		{
 			int found = 0;
 			Item[] items = c.item;
 			Item[] inv = new Item[3];
 			for (int i = 0; i < 40; i++)
 			{
+				if (items[i] == null)
+				{
+					continue;
+				}
 				if (items[i].Name.ToLower().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) != -1)
 				{
 					inv[found] = items[i];
-					if (i > 0)
+					if (found > 0)
 					{
-						if (items[i].type == items[i - 1].type)
+						if (inv[found].type == inv[found - 1].type)
 						{
+							inv[found] = null;
 							found--;
 						}
 					}
@@ -67,7 +82,7 @@ namespace WheresMyItems
 				}
 			}
 			nInv = inv;
-			return found > 0;
+			return found;
 		}
 
 		public void NewDustSlowed(Vector2 pos, int w, int h, int type, int interval)
@@ -89,17 +104,12 @@ namespace WheresMyItems
 			return new Rectangle((int)v.X, (int)v.Y, t.Width, t.Height);
 		}
 
-		public void DrawSlot(Vector2 cPos, Texture2D item, Texture2D box, float scale, Color colour)
+		public DrawData[] DrawDataSlot(Vector2 cPos, Texture2D item, Texture2D box, float scale, Color colour)
 		{
-			//Main.spriteBatch.Draw(box, CreateRect(cPos - HalfSize(box), box), CreateRect(Vector2.Zero,box), Color.White,0f,Vector2.Zero,scale ,SpriteEffects.None,0);
-			//Main.spriteBatch.Draw(item, CreateRect(cPos - HalfSize(item), item), CreateRect(Vector2.Zero, item), Color.White, 0f,Vector2.Zero,scale, SpriteEffects.None,0);
-			Main.spriteBatch.Draw(box, cPos - HalfSize(box, scale), CreateRect(Vector2.Zero, box), colour, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
-			Main.spriteBatch.Draw(item, cPos - HalfSize(item, scale), CreateRect(Vector2.Zero, item), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
-		}
-
-		public override void ModifyDrawLayers(List<PlayerLayer> layers)
-		{
-			base.ModifyDrawLayers(layers);
+			DrawData[] d = new DrawData[2];
+			d[0] = new DrawData(box, cPos - HalfSize(box, scale), CreateRect(Vector2.Zero, box), colour, 0f, Vector2.Zero, scale, SpriteEffects.None, 1);
+			d[1] = new DrawData(item, cPos - HalfSize(item, scale), CreateRect(Vector2.Zero, item), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 1);
+			return d;
 		}
 
 		public override void DrawEffects(PlayerDrawInfo drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
@@ -109,8 +119,10 @@ namespace WheresMyItems
 			{
 				gameCounter = 0;
 			}
+			WheresMyItemsUI.l = new List<DrawData[]> { };
 			if (WheresMyItemsUI.visible && player == Main.LocalPlayer)
 			{
+
 				Texture2D[] bank = new Texture2D[3];
 				Vector2[] pos = new Vector2[3];
 				Texture2D box = mod.GetTexture("box");
@@ -124,7 +136,7 @@ namespace WheresMyItems
 
 				for (int i = 0; i < 3; i++)
 				{
-					DrawSlot(pos[i], bank[i], box, 1f, Color.White);
+					WheresMyItemsUI.l.Add(DrawDataSlot(pos[i], bank[i], box, 1f, Color.White));
 				}
 				//Main.NewText(Main.player[Main.myPlayer].chest.ToString());
 				/*if (player.townNPCs < 1f)
@@ -166,42 +178,57 @@ namespace WheresMyItems
 							//	waitTimes[chestIndex] = 10;
 							//	continue;
 							//}
-							if (TestForItem(chest, searchTerm, ref curInv))
+							int no = TestForItem(chest, searchTerm, ref curInv);
+							if (no > 0)
 							{
-								Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
-								Rectangle chestArea = new Rectangle(chest.x * 16, chest.y * 16, 32, 32);
-								Vector2[] hoverPos = new Vector2[3];
-								Texture2D[] itemT = new Texture2D[3];
+								NewDustSlowed(new Vector2(chest.x * 16, chest.y * 16), 32, 32, 16, 10); //107
+																										// draw peek boxes
 
-								hoverPos[1] = mousePosition - Main.screenPosition;
-								hoverPos[0] = hoverPos[1] - new Vector2(48, 0);
-								hoverPos[2] = hoverPos[1] + new Vector2(48, 0);
-								// hover check
-								if (chestArea.Contains(mousePosition.ToPoint()))
+								Rectangle chestArea = new Rectangle(chest.x * 16, chest.y * 16, 32, 32);
+								Vector2[] peekPos = new Vector2[3];
+								Texture2D[] itemT = new Texture2D[3];
+								if (hover)
 								{
-									for (int i = 0; i < 3; i++)
+									Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
+									peekPos[1] = mousePosition - Main.screenPosition;
+
+									// hover check
+									if (!chestArea.Contains(mousePosition.ToPoint()))
 									{
-										if (curInv[i] != null)
+
+										continue;
+									}
+									Main.NewText(no.ToString());
+								}
+								else
+								{
+									peekPos[1] = chestArea.Center.ToVector2() - Main.screenPosition;
+								}
+								peekPos[1] += new Vector2(3, 4);
+								// I'm not too sure why, but without this displacement, the peek box is slightly off center
+								peekPos[0] = peekPos[1] - new Vector2(0, 48 * sc);
+								peekPos[2] = peekPos[1] + new Vector2(0, 48 * sc);
+								for (int i = 0; i < 3; i++)
+								{
+									peekPos[i] += new Vector2(0, sc * 24 * (3 - no));
+									if (curInv[i] != null)
+									{
+										if (curInv[i].type > Main.itemTexture.Length)
 										{
-											if (curInv[i].type > Main.itemTexture.Length)
-											{
-												itemT[i] = curInv[i].modItem.mod.GetTexture(curInv[i].modItem.Texture);
-											}
-											else
-											{
-												itemT[i] = Main.itemTexture[curInv[i].type];
-											}
-											DrawSlot(hoverPos[i], itemT[i], box, 1f, Color.Red);
+											itemT[i] = curInv[i].modItem.mod.GetTexture(curInv[i].modItem.Texture);
 										}
+										else
+										{
+											itemT[i] = Main.itemTexture[curInv[i].type];
+										}
+										WheresMyItemsUI.l.Add(DrawDataSlot(peekPos[i], itemT[i], box, sc, Color.Red));
 									}
 								}
-								NewDustSlowed(new Vector2(chest.x * 16, chest.y * 16), 32, 32, 16, 10); //107
 							}
 						}
 					}
 				}
 				// deal with extra invens
-
 				Chest bk;
 				for (int i = 0; i < 3; i++)
 				{
@@ -219,7 +246,7 @@ namespace WheresMyItems
 							bk = player.bank;
 							break;
 					}
-					if (TestForItem(bk, searchTerm, ref curInv))
+					if (TestForItem(bk, searchTerm, ref curInv) > 0)
 					{
 						NewDustSlowed(pos[i] + Main.screenPosition, 1, 1, 16, 30); //used to be 6 //188
 					}
