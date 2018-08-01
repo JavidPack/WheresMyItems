@@ -148,7 +148,7 @@ namespace WheresMyItems
 
 		public void AddItem(Vector2 pos, Texture2D itemText, Texture2D box, float scale, Color colour, Item curItem)
 		{
-			
+
 			WheresMyItemsUI.worldZoomDrawDatas.Add(DrawDataSlot(pos, itemText, box, scale, colour));
 			WheresMyItemsUI.worldZoomItems.Add(curItem);
 			WheresMyItemsUI.worldZoomPositions.Add(pos - 1.25f * HalfSize(box, scale));
@@ -186,7 +186,7 @@ namespace WheresMyItems
 				Texture2D box = mod.GetTexture("box");
 				bank[0] = Main.itemTexture[87];
 				bank[1] = Main.itemTexture[346];
-				bank[2] = Main.itemTexture[3813];;
+				bank[2] = Main.itemTexture[3813]; ;
 				Vector2 plTopCenter = player.position + new Vector2(player.width / 2, 0f) - Main.screenPosition;
 				pos[0] = plTopCenter + new Vector2(-48, -32);
 				pos[1] = plTopCenter + new Vector2(0, -32);
@@ -240,7 +240,7 @@ namespace WheresMyItems
 							if (no > 0)
 							{
 								NewDustSlowed(new Vector2(chest.x * 16, chest.y * 16), 32, 32, 16, 10); //107
-								// draw peek boxes
+																										// draw peek boxes
 								Rectangle chestArea = new Rectangle(chest.x * 16, chest.y * 16, 32, 32);
 								Vector2[] peekPos = new Vector2[3];
 								Texture2D[] itemT = new Texture2D[3];
@@ -322,7 +322,7 @@ namespace WheresMyItems
 				Vector2 tilePos = Vector2.Zero;
 				Chest bktile;
 
-				float dist = (float)Math.Sqrt(Math.Pow(itemSearchRange,2) / 2);
+				float dist = (float)Math.Sqrt(Math.Pow(itemSearchRange, 2) / 2);
 				Vector2 start = Gtp(player.Center - new Vector2(dist, dist));
 				Vector2 end = Gtp(player.Center + new Vector2(dist, dist));
 
@@ -386,7 +386,7 @@ namespace WheresMyItems
 							{
 								Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
 								peekPos[1] = mousePosition - Main.screenPosition;
-									
+
 								// hover check
 								if (!chestArea.Contains(mousePosition.ToPoint()))
 								{

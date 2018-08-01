@@ -137,7 +137,7 @@ namespace WheresMyItems
 				{
 					worldZoomDrawDatas[i][1].Draw(spriteBatch);
 				}
-				
+
 			}
 		}
 	}
