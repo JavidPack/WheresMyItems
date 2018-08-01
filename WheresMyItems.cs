@@ -38,7 +38,7 @@ namespace WheresMyItems
 
 		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
 		{
-			int vanillaInventoryLayerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+			int vanillaInventoryLayerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Fancy UI"));
 			if (vanillaInventoryLayerIndex != -1)
 			{
 				layers.Insert(vanillaInventoryLayerIndex, new LegacyGameInterfaceLayer(

@@ -16,6 +16,8 @@ namespace WheresMyItems
 		public static bool visible = false;
 		public static NewUITextBox box;
 		public static List<DrawData[]> worldZoomDrawDatas = new List<DrawData[]>();
+		public static List<Item> worldZoomItems = new List<Item>();
+		public static List<Vector2> worldZoomPositions = new List<Vector2>();
 
 		public static string SearchTerm
 		{
@@ -123,7 +125,19 @@ namespace WheresMyItems
 			for (int i = 0; i < worldZoomDrawDatas.Count; i++)
 			{
 				worldZoomDrawDatas[i][0].Draw(spriteBatch);
-				worldZoomDrawDatas[i][1].Draw(spriteBatch);
+				if (worldZoomItems[i] != null)
+				{
+					Item curItem = worldZoomItems[i];
+					float oldScale = Main.inventoryScale;
+					Main.inventoryScale = .8f;
+					ItemSlot.Draw(spriteBatch, ref curItem, 21, worldZoomPositions[i]);
+					Main.inventoryScale = oldScale;
+				}
+				else
+				{
+					worldZoomDrawDatas[i][1].Draw(spriteBatch);
+				}
+				
 			}
 		}
 	}

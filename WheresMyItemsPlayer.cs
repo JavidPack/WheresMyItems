@@ -105,6 +105,69 @@ namespace WheresMyItems
 			return d;
 		}
 
+		public Vector2 GetTile(Vector2 start, Vector2 end, int i)
+		{
+			int y = (int)start.Y;
+			int x = (int)start.X + i;
+			while (x - end.X > -1)
+			{
+				y++;
+				x -= (int)(end.X - start.X);
+			}
+			return new Vector2(x, y);
+		}
+
+		public int NoTile(Vector2 start, Vector2 end)
+		{
+			return (int)((end.X - start.X) * (end.Y - start.Y));
+		}
+
+		public Vector2 Gtp(Vector2 xy)
+		{
+			//get tile position
+			//is it x or y, bool X tells you
+			xy /= 16;
+			xy.X = (int)xy.X;
+			xy.Y = (int)xy.Y;
+			return xy;
+		}
+
+		public void DeactTiles(ref int nodt, ref Vector2[] deactivatedTiles, bool deactivated, Vector2 tilePos, Vector2 size)
+		{
+			int nodtiles = NoTile(tilePos, tilePos + size);
+			if (!deactivated)
+			{
+				for (int k = 1; k < nodtiles; k++)
+				{
+					deactivatedTiles[nodt] = GetTile(tilePos, tilePos + size, k);
+					//string text = (deactivatedTiles[nodt] - tilePos).ToString();
+					nodt++;
+				}
+			}
+		}
+
+		public void AddItem(Vector2 pos, Texture2D itemText, Texture2D box, float scale, Color colour, Item curItem)
+		{
+			
+			WheresMyItemsUI.worldZoomDrawDatas.Add(DrawDataSlot(pos, itemText, box, scale, colour));
+			WheresMyItemsUI.worldZoomItems.Add(curItem);
+			WheresMyItemsUI.worldZoomPositions.Add(pos - 1.25f * HalfSize(box, scale));
+		}
+
+		public void DrawPeeks(Vector2[] peekPos, Texture2D[] itemT, Texture2D box, Item[] inv, int no, int bank)// int bank is only used when you want to draw peeks for the bank icons above the player's head. Bank has to be -1 for those peeks to be drawn correctly. Otherwise, it can be 1; 
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				peekPos[i] += new Vector2(0, sc * 24 * (3 - no));
+				if (inv[i] != null && !inv[i].IsAir)
+				{
+					itemT[i] = Main.itemTexture[inv[i].type];
+					AddItem(peekPos[i], itemT[i], box, sc, Color.Red, inv[i]);
+				}
+			}
+		}
+
+
 		public override void DrawEffects(PlayerDrawInfo drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
 		{
 			if (WheresMyItemsUI.visible && player == Main.LocalPlayer)
@@ -115,13 +178,15 @@ namespace WheresMyItems
 					gameCounter = 0;
 				}
 				WheresMyItemsUI.worldZoomDrawDatas.Clear();
+				WheresMyItemsUI.worldZoomItems.Clear();
+				WheresMyItemsUI.worldZoomPositions.Clear();
 
 				Texture2D[] bank = new Texture2D[3];
 				Vector2[] pos = new Vector2[3];
 				Texture2D box = mod.GetTexture("box");
-				bank[0] = mod.GetTexture("b1");
-				bank[1] = mod.GetTexture("b2");
-				bank[2] = mod.GetTexture("b3");
+				bank[0] = Main.itemTexture[87];
+				bank[1] = Main.itemTexture[346];
+				bank[2] = Main.itemTexture[3813];;
 				Vector2 plTopCenter = player.position + new Vector2(player.width / 2, 0f) - Main.screenPosition;
 				pos[0] = plTopCenter + new Vector2(-48, -32);
 				pos[1] = plTopCenter + new Vector2(0, -32);
@@ -129,7 +194,7 @@ namespace WheresMyItems
 
 				for (int i = 0; i < 3; i++)
 				{
-					WheresMyItemsUI.worldZoomDrawDatas.Add(DrawDataSlot(pos[i], bank[i], box, 1f, Color.White));
+					AddItem(pos[i], bank[i], box, 1f, Color.White, null);
 				}
 				//Main.NewText(Main.player[Main.myPlayer].chest.ToString());
 				/*if (player.townNPCs < 1f)
@@ -175,8 +240,7 @@ namespace WheresMyItems
 							if (no > 0)
 							{
 								NewDustSlowed(new Vector2(chest.x * 16, chest.y * 16), 32, 32, 16, 10); //107
-																										// draw peek boxes
-
+								// draw peek boxes
 								Rectangle chestArea = new Rectangle(chest.x * 16, chest.y * 16, 32, 32);
 								Vector2[] peekPos = new Vector2[3];
 								Texture2D[] itemT = new Texture2D[3];
@@ -195,28 +259,18 @@ namespace WheresMyItems
 								{
 									peekPos[1] = chestArea.Center.ToVector2() - Main.screenPosition;
 								}
-								//peekPos[1] += new Vector2(3, 4);
-								// I'm not too sure why, but without this displacement, the peek box is slightly off center
 								peekPos[0] = peekPos[1] - new Vector2(0, 48 * sc);
 								peekPos[2] = peekPos[1] + new Vector2(0, 48 * sc);
-								for (int i = 0; i < 3; i++)
-								{
-									peekPos[i] += new Vector2(0, sc * 24 * (3 - no));
-									if (curInv[i] != null && !curInv[i].IsAir)
-									{
-										itemT[i] = Main.itemTexture[curInv[i].type];
-										WheresMyItemsUI.worldZoomDrawDatas.Add(DrawDataSlot(peekPos[i], itemT[i], box, sc, Color.Red));
-									}
-								}
+								DrawPeeks(peekPos, itemT, box, curInv, no, 1);
 							}
 						}
 					}
 				}
 				// deal with extra invens
 				Chest bk;
-				for (int i = 0; i < 3; i++)
+				for (int bankno = 0; bankno < 3; bankno++)
 				{
-					switch (i)
+					switch (bankno)
 					{
 						case 1:
 							bk = player.bank2;
@@ -230,41 +284,126 @@ namespace WheresMyItems
 							bk = player.bank;
 							break;
 					}
-					if (TestForItem(bk, searchTerm, ref curInv) > 0)
+					int no = TestForItem(bk, searchTerm, ref curInv);
+					if (no > 0)
 					{
-						NewDustSlowed(pos[i] + Main.screenPosition, 1, 1, 16, 30);
-						pos[i].X -= 16;
-						pos[i].Y -= 16;
-						Vector2 hoverCorner = pos[i] + Main.screenPosition;
+						NewDustSlowed(pos[bankno] + Main.screenPosition, 1, 1, 16, 30);
+						pos[bankno].X -= 16;
+						pos[bankno].Y -= 16;
+						Vector2 hoverCorner = pos[bankno] + Main.screenPosition;
 						Rectangle chestArea = new Rectangle((int)hoverCorner.X, (int)hoverCorner.Y, 32, 32);
 						Vector2[] peekPos = new Vector2[3];
 						Texture2D[] itemT = new Texture2D[3];
 						if (hover)
 						{
-							// TODO, scale correctly
 							Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
-							peekPos[0] = mousePosition - Main.screenPosition;
-							//peekPos[0].X -= 16;
+							peekPos[1] = mousePosition - Main.screenPosition;// + new Vector2(0, 48 * sc);
+							peekPos[0] = peekPos[1] - new Vector2(0, 48 * sc);
+							peekPos[2] = peekPos[1] + new Vector2(0, 48 * sc);
 							if (!chestArea.Contains(mousePosition.ToPoint()))
 							{
 								continue;
 							}
+							DrawPeeks(peekPos, itemT, box, curInv, no, -1); // pass 3 as "no" so that there's no offset
 						}
 						else
 						{
 							peekPos[0] = chestArea.Center.ToVector2() - Main.screenPosition;
-							//peekPos[0].X -= 16;
+							peekPos[1] = peekPos[0] - new Vector2(0, 48 * sc);
+							peekPos[2] = peekPos[1] - new Vector2(0, 48 * sc);
+							DrawPeeks(peekPos, itemT, box, curInv, 3, -1); // pass 3 as "no" so that there's no offset
 						}
-						peekPos[1] = peekPos[0] - new Vector2(0, 48 * sc);
-						peekPos[2] = peekPos[1] - new Vector2(0, 48 * sc);
-						for (int j = 0; j < 3; j++)
+					}
+				}
+				// deal with tiles of extra invens
+				//Vector2 mouseTilePos = Gtp(new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition); for debugging
+				//Main.NewText(Main.tile[(int)mouseTilePos.X, (int)mouseTilePos.Y].ToString()); for debugging
+				Tile tile;
+				Vector2 tilePos = Vector2.Zero;
+				Chest bktile;
+
+				float dist = (float)Math.Sqrt(Math.Pow(itemSearchRange,2) / 2);
+				Vector2 start = Gtp(player.Center - new Vector2(dist, dist));
+				Vector2 end = Gtp(player.Center + new Vector2(dist, dist));
+
+				// This deactivating system is used to ensure we don't have several peek boxes drawn for multi-tile banks (since the peek system checks each tile to see if it's a bank and hence draw a peek). It "deactivates" every tile except for the one in the top-left corner.
+				int notiles = NoTile(start, end);
+				Vector2[] deactivatedTiles = new Vector2[notiles];
+				int nodt = 0;
+				for (int j = 0; j < notiles; j++)
+				{
+					tilePos = GetTile(start, end, j);
+					tile = Main.tile[(int)tilePos.X, (int)tilePos.Y];
+					if (tile.active())
+					{
+						bool deactivated = false;
+						for (int k = 0; k < nodt; k++)
 						{
-							//peekPos[j] += new Vector2(0, sc * 24);
-							if (curInv[j] != null && !curInv[j].IsAir)
+							if (tilePos == deactivatedTiles[k])
 							{
-								itemT[j] = Main.itemTexture[curInv[j].type];
-								WheresMyItemsUI.worldZoomDrawDatas.Add(DrawDataSlot(peekPos[j], itemT[j], box, sc, Color.Red));
+								deactivated = true;
+								/*if (tilePos == mouseTilePos) //for debugging
+								{
+									NewDustSlowed(deactivatedTiles[k] * 16, 32, 32, 21, 10);
+								}*/
 							}
+						}
+						Rectangle chestArea = new Rectangle();
+						Vector2 tSize = Vector2.Zero;
+						if (tile.frameX != 0 || tile.frameY != 0) // if we haven't found the top-left corner of the block
+						{
+							continue;
+						}
+						switch (tile.type)
+						{
+							case 29:
+								bktile = player.bank;
+								tSize = new Vector2(2, 1);
+								DeactTiles(ref nodt, ref deactivatedTiles, deactivated, tilePos, tSize);
+								break;
+							case 97:
+								bktile = player.bank2;
+								tSize = new Vector2(2, 2);
+								DeactTiles(ref nodt, ref deactivatedTiles, deactivated, tilePos, tSize);
+								break;
+							case 463:
+								bktile = player.bank3;
+								tSize = new Vector2(3, 4);
+								DeactTiles(ref nodt, ref deactivatedTiles, deactivated, tilePos, tSize);
+								break;
+							default:
+								continue;
+						}
+						int no = TestForItem(bktile, searchTerm, ref curInv);
+						if (no > 0)
+						{
+							// draw peek boxes
+							chestArea = new Rectangle((int)tilePos.X * 16, (int)tilePos.Y * 16, (int)tSize.X * 16, (int)tSize.Y * 16);
+							// chestArea declared above instead since the "chest area" varies for the piggy bank + forge
+							Vector2[] peekPos = new Vector2[3];
+							Texture2D[] itemT = new Texture2D[3];
+							if (hover)
+							{
+								Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
+								peekPos[1] = mousePosition - Main.screenPosition;
+									
+								// hover check
+								if (!chestArea.Contains(mousePosition.ToPoint()))
+								{
+									continue;
+								}
+							}
+							else if (!deactivated)
+							{
+								peekPos[1] = chestArea.Center.ToVector2() - Main.screenPosition;
+							}
+							else
+							{
+								continue;
+							}
+							peekPos[0] = peekPos[1] - new Vector2(0, 48 * sc);
+							peekPos[2] = peekPos[1] + new Vector2(0, 48 * sc);
+							DrawPeeks(peekPos, itemT, box, curInv, no, 1);
 						}
 					}
 				}
