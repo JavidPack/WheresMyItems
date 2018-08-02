@@ -18,7 +18,8 @@ namespace WheresMyItems
 			base.DrawSelf(spriteBatch);
 			if (IsMouseHovering)
 			{
-				Main.hoverItemName = hoverText;
+				//Main.hoverItemName = hoverText; // Main.hoverItemName is reset during "Vanilla: Interface Logic 3"
+				WheresMyItems.hoverItemNameBackup = hoverText;
 			}
 		}
 	}

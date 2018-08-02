@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -36,6 +37,13 @@ namespace WheresMyItems
 			RandomBuffHotKey = null;
 		}
 
+		public override void UpdateUI(GameTime gameTime)
+		{
+			if (wheresMyItemsUserInterface != null)
+				wheresMyItemsUserInterface.Update(gameTime);
+		}
+
+		public static string hoverItemNameBackup;
 		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
 		{
 			int vanillaInventoryLayerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Fancy UI"));
@@ -45,6 +53,7 @@ namespace WheresMyItems
 					"WheresMyItems: Quick Search",
 					delegate
 					{
+						hoverItemNameBackup = null;
 						if (WheresMyItemsUI.visible)
 						{
 							if (lastSeenScreenWidth != Main.screenWidth || lastSeenScreenHeight != Main.screenHeight)
@@ -53,9 +62,22 @@ namespace WheresMyItems
 								lastSeenScreenWidth = Main.screenWidth;
 								lastSeenScreenHeight = Main.screenHeight;
 							}
-							wheresMyItemsUserInterface.Update(Main._drawInterfaceGameTime);
-							wheresMyItemsUI.Draw(Main.spriteBatch);
+							wheresMyItemsUserInterface.Draw(Main.spriteBatch, new GameTime());
 						}
+						return true;
+					},
+					InterfaceScaleType.UI)
+				);
+			}
+			int mouseTextLayerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+			if (mouseTextLayerIndex != -1)
+			{
+				layers.Insert(mouseTextLayerIndex, new LegacyGameInterfaceLayer(
+					"WheresMyItems: Hover Text Logic",
+					delegate
+					{
+						if (!string.IsNullOrEmpty(hoverItemNameBackup))
+							Main.hoverItemName = hoverItemNameBackup;
 						return true;
 					},
 					InterfaceScaleType.UI)
