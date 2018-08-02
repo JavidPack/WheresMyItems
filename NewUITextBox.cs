@@ -87,7 +87,7 @@ namespace WheresMyItems
 		public override void Update(GameTime gameTime)
 		{
 			Vector2 MousePosition = new Vector2((float)Main.mouseX, (float)Main.mouseY);
-			if (!ContainsPoint(MousePosition) && (Main.mouseLeft || Main.mouseRight) && !WheresMyItemsUI.dragging)
+			if (focused && !ContainsPoint(MousePosition) && (Main.mouseLeft || Main.mouseRight) && !WheresMyItemsUI.dragging)
 			{
 				Main.LocalPlayer.mouseInterface = true;
 				Unfocus();
