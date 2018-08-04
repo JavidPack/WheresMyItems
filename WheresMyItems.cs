@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -12,6 +13,10 @@ namespace WheresMyItems
 		private UserInterface wheresMyItemsUserInterface;
 		internal WheresMyItemsUI wheresMyItemsUI;
 		public static ModHotKey RandomBuffHotKey;
+
+		public static Mod MagicStorage;
+		public static int MagicStorage_TileType_StorageHeart;
+		public static MethodInfo MagicStorage_TEStorageHeart_GetStoredItems;
 
 		int lastSeenScreenWidth;
 		int lastSeenScreenHeight;
@@ -30,11 +35,29 @@ namespace WheresMyItems
 				wheresMyItemsUserInterface = new UserInterface();
 				wheresMyItemsUserInterface.SetState(wheresMyItemsUI);
 			}
+			MagicStorage = ModLoader.GetMod("MagicStorage");
 		}
 
 		public override void Unload()
 		{
 			RandomBuffHotKey = null;
+
+			MagicStorage = null; // Do this or MagicStorage won't fully unload.
+			MagicStorage_TileType_StorageHeart = 0;
+			MagicStorage_TEStorageHeart_GetStoredItems = null; // These 2 are for clean code and don't prevent GC 
+		}
+
+		public override void PostSetupContent()
+		{
+			// All Mods have done Load already, so all Tiles have IDs
+			MagicStorage_TileType_StorageHeart = MagicStorage?.TileType("StorageHeart") ?? 0;
+			if(MagicStorage_TileType_StorageHeart > 0)
+			{
+				// Namespace: MagicStorage.Components 
+				// Class: TEStorageHeart
+				// Method: public IEnumerable<Item> GetStoredItems()
+				MagicStorage_TEStorageHeart_GetStoredItems = MagicStorage.GetType().Assembly.GetType("MagicStorage.Components.TEStorageHeart").GetMethod("GetStoredItems", BindingFlags.Instance | BindingFlags.Public);
+			}
 		}
 
 		public override void UpdateUI(GameTime gameTime)

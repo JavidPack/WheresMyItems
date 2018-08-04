@@ -78,6 +78,38 @@ namespace WheresMyItems
 			return found;
 		}
 
+		public int TestForItem(IEnumerable<Item> c, string searchTerm, ref Item[] nInv)
+		{
+			int found = 0;
+			Item[] inv = new Item[3];
+			foreach (Item item in c)
+			{
+				if (item == null)
+				{
+					continue;
+				}
+				if (item.Name.ToLower().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) != -1)
+				{
+					inv[found] = item.Clone();
+					if (found > 0)
+					{
+						if (inv[found].type == inv[found - 1].type)
+						{
+							inv[found] = null;
+							found--;
+						}
+					}
+					found++;
+					if (found == 3)
+					{
+						break;
+					}
+				}
+			}
+			nInv = inv;
+			return found;
+		}
+
 		public void NewDustSlowed(Vector2 pos, int w, int h, int type, int interval)
 		{
 			Point tPos = pos.ToTileCoordinates();
@@ -404,6 +436,57 @@ namespace WheresMyItems
 							peekPos[0] = peekPos[1] - new Vector2(0, 48 * sc);
 							peekPos[2] = peekPos[1] + new Vector2(0, 48 * sc);
 							DrawPeeks(peekPos, itemT, box, curInv, no, 1);
+						}
+					}
+				}
+
+				// Magic Storage Integration/Support
+				if (WheresMyItems.MagicStorage != null)
+				{
+					var center = Main.LocalPlayer.Center.ToTileCoordinates();
+					int tileRange = itemSearchRange / 16;
+					for (int i = -tileRange + center.X; i < tileRange + center.X; i++) // Maybe fix this square range to be circular.
+					{
+						for (int j = -tileRange + center.Y; j < tileRange + center.Y; j++)
+						{
+							if (WorldGen.InWorld(i, j) && Main.tile[i, j].active() && Main.tile[i, j].type == WheresMyItems.MagicStorage_TileType_StorageHeart && Main.tile[i, j].frameX == 0 && Main.tile[i, j].frameY == 0)
+							{
+								//NewDustSlowed(new Vector2(i + 0.5f, j + 0.5f) * 16, 16, 16, 16, 20);
+
+								TileEntity teStorageHeart = TileEntity.ByPosition[new Point16(i, j)];
+								if (teStorageHeart == null)
+									continue;
+
+								IEnumerable<Item> items = (IEnumerable<Item>)WheresMyItems.MagicStorage_TEStorageHeart_GetStoredItems.Invoke(teStorageHeart, new object[] { });
+
+								int no = TestForItem(items, searchTerm, ref curInv);
+								if (no > 0)
+								{
+									NewDustSlowed(new Vector2(i * 16, j * 16), 32, 32, 16, 10); //107
+																											// draw peek boxes
+									Rectangle chestArea = new Rectangle(i * 16, j * 16, 32, 32);
+									Vector2[] peekPos = new Vector2[3];
+									Texture2D[] itemT = new Texture2D[3];
+									if (hover)
+									{
+										Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
+										peekPos[1] = mousePosition - Main.screenPosition;
+
+										// hover check
+										if (!chestArea.Contains(mousePosition.ToPoint()))
+										{
+											continue;
+										}
+									}
+									else
+									{
+										peekPos[1] = chestArea.Center.ToVector2() - Main.screenPosition;
+									}
+									peekPos[0] = peekPos[1] - new Vector2(0, 48 * sc);
+									peekPos[2] = peekPos[1] + new Vector2(0, 48 * sc);
+									DrawPeeks(peekPos, itemT, box, curInv, no, 1);
+								}
+							}
 						}
 					}
 				}

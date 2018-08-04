@@ -1,4 +1,6 @@
-﻿Adds a method to locate items in chests easily. Press the hotkey and then start typing.
+﻿Adds a method to locate items in chests easily. Press the hotkey and then start typing to find items in chests.
 
-Note that you can't use the search unless you are near town npcs, to prevent cheating.
+Make sure to assign the hotkey in the keybindings menu.
+
+To use, simply press the hotkey and start typing a search term. Chests, Banks (Piggy Bank, Safe, Defenders Forge), and Magic Storage Hearts containing items matching the search term will display a quick peek at up to 3 results. 
 
