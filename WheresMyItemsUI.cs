@@ -23,6 +23,7 @@ namespace WheresMyItems
 		{
 			get { return box.Text; }
 		}
+		public static string history = "";
 
 		public override void OnInitialize()
 		{
@@ -47,12 +48,22 @@ namespace WheresMyItems
 			searchBarPanel.Append(playButton);
 
 			box = new NewUITextBox("Type here to search", 0.78f);
+			box.OnTabPressed += () => 
+			{
+				if (!string.IsNullOrEmpty(history))
+					box.SetText(history);
+			};
 			box.BackgroundColor = Color.Transparent;
 			box.BorderColor = Color.Transparent;
 			box.Left.Pixels = 15;
 			box.Top.Pixels = -5;
 			box.MinWidth.Pixels = 120;
-			box.OnUnfocus += () => visible = false;
+			box.OnUnfocus += () => 
+			{
+				if (!string.IsNullOrEmpty(box.Text))
+					history = box.Text;
+				visible = false;
+			};
 			searchBarPanel.Append(box);
 
 			Append(searchBarPanel);
@@ -137,7 +148,6 @@ namespace WheresMyItems
 				{
 					worldZoomDrawDatas[i][1].Draw(spriteBatch);
 				}
-
 			}
 		}
 	}

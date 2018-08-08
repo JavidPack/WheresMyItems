@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using ReLogic.Graphics;
 using System;
 using Terraria;
@@ -20,6 +21,8 @@ namespace WheresMyItems
 		public event Action OnFocus;
 
 		public event Action OnUnfocus;
+
+		public event Action OnTabPressed;
 
 		public NewUITextBox(string text, float textScale = 1, bool large = false) : base("", textScale, large)
 		{
@@ -148,6 +151,11 @@ namespace WheresMyItems
 			}
 		}
 
+		private static bool JustPressed(Keys key)
+		{
+			return Main.inputText.IsKeyDown(key) && !Main.oldInputText.IsKeyDown(key);
+		}
+
 		internal int counter = 0;
 
 		protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -164,6 +172,12 @@ namespace WheresMyItems
 			{
 				Unfocus();
 			}
+
+			if (JustPressed(Keys.Tab))
+			{
+				OnTabPressed?.Invoke();
+			}
+
 			//if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Enter))
 
 			if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Enter))

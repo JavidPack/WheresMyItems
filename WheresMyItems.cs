@@ -62,8 +62,9 @@ namespace WheresMyItems
 
 		public override void UpdateUI(GameTime gameTime)
 		{
-			if (wheresMyItemsUserInterface != null)
-				wheresMyItemsUserInterface.Update(gameTime);
+			if (WheresMyItemsUI.visible)
+				if (wheresMyItemsUserInterface != null)
+					wheresMyItemsUserInterface.Update(gameTime);
 		}
 
 		public static string hoverItemNameBackup;
