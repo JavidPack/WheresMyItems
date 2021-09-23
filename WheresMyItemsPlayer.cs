@@ -2,10 +2,10 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using Terraria.DataStructures;
+using Terraria;
 
 namespace WheresMyItems
 {
@@ -42,7 +42,7 @@ namespace WheresMyItems
 		public bool ChestWithinRange(Chest c, int range)
 		{
 			Vector2 chestCenter = new Vector2((c.x * 16 + 16), (c.y * 16 + 16));
-			return (chestCenter - player.Center).Length() < range;
+			return (chestCenter - Player.Center).Length() < range;
 		}
 
 		public int TestForItem(Chest c, string searchTerm, ref Item[] nInv)
@@ -186,23 +186,23 @@ namespace WheresMyItems
 			WheresMyItemsUI.worldZoomPositions.Add(pos - 1.25f * HalfSize(box, scale));
 		}
 
-		public void DrawPeeks(Vector2[] peekPos, Texture2D[] itemT, Texture2D box, Item[] inv, int no, int bank)// int bank is only used when you want to draw peeks for the bank icons above the player's head. Bank has to be -1 for those peeks to be drawn correctly. Otherwise, it can be 1; 
+		public void DrawPeeks(Vector2[] peekPos, Texture2D[] itemT, Texture2D box, Item[] inv, int no, int bank)// int bank is only used when you want to draw peeks for the bank icons above the Player's head. Bank has to be -1 for those peeks to be drawn correctly. Otherwise, it can be 1; 
 		{
 			for (int i = 0; i < 3; i++)
 			{
 				peekPos[i] += new Vector2(0, sc * 24 * (3 - no));
 				if (inv[i] != null && !inv[i].IsAir)
 				{
-					itemT[i] = Main.itemTexture[inv[i].type];
+					itemT[i] = Terraria.GameContent.TextureAssets.Item[inv[i].type].Value;
 					AddItem(peekPos[i], itemT[i], box, sc, Color.Red, inv[i]);
 				}
 			}
 		}
 
 
-		public override void DrawEffects(PlayerDrawInfo drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
+		public override void DrawEffects(Terraria.DataStructures.PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
 		{
-			if (WheresMyItemsUI.visible && player == Main.LocalPlayer)
+			if (WheresMyItemsUI.visible && Player == Main.LocalPlayer)
 			{
 				gameCounter++;
 				if (gameCounter == 99999)
@@ -215,11 +215,11 @@ namespace WheresMyItems
 
 				Texture2D[] bank = new Texture2D[3];
 				Vector2[] pos = new Vector2[3];
-				Texture2D box = mod.GetTexture("box");
-				bank[0] = Main.itemTexture[87];
-				bank[1] = Main.itemTexture[346];
-				bank[2] = Main.itemTexture[3813]; ;
-				Vector2 plTopCenter = player.position + new Vector2(player.width / 2, 0f) - Main.screenPosition;
+				Texture2D box = Mod.Assets.Request<Texture2D>("box").Value;
+				bank[0] = Terraria.GameContent.TextureAssets.Item[87].Value;
+				bank[1] = Terraria.GameContent.TextureAssets.Item[346].Value;
+				bank[2] = Terraria.GameContent.TextureAssets.Item[3813].Value; ;
+				Vector2 plTopCenter = Player.position + new Vector2(Player.width / 2, 0f) - Main.screenPosition;
 				pos[0] = plTopCenter + new Vector2(-48, -32);
 				pos[1] = plTopCenter + new Vector2(0, -32);
 				pos[2] = plTopCenter + new Vector2(48, -32);
@@ -228,8 +228,8 @@ namespace WheresMyItems
 				{
 					AddItem(pos[i], bank[i], box, 1f, Color.White, null);
 				}
-				//Main.NewText(Main.player[Main.myPlayer].chest.ToString());
-				/*if (player.townNPCs < 1f)
+				//Main.NewText(Main.Player[Main.myPlayer].chest.ToString());
+				/*if (Player.townNPCs < 1f)
 				{
 					WheresMyItemsUI.box.SetText("");
 					WheresMyItemsUI.box.Unfocus();
@@ -246,13 +246,13 @@ namespace WheresMyItems
 						continue;
 					}
 					Chest chest = Main.chest[chestIndex];
-					if (chest != null && /*!Chest.IsPlayerInChest(i) &&*/ !Chest.isLocked(chest.x, chest.y))
+					if (chest != null && /*!Chest.IsPlayerInChest(i) &&*/ !Chest.IsLocked(chest.x, chest.y))
 					{
 						if (ChestWithinRange(chest, itemSearchRange))
 						{
 							if (chest.item[0] == null)
 							{
-								var message = mod.GetPacket();
+								var message = Mod.GetPacket();
 								message.Write((byte)MessageType.SilentRequestChestContents);
 								message.Write(chestIndex);
 								message.Send();
@@ -305,15 +305,15 @@ namespace WheresMyItems
 					switch (bankno)
 					{
 						case 1:
-							bk = player.bank2;
+							bk = Player.bank2;
 							break;
 
 						case 2:
-							bk = player.bank3;
+							bk = Player.bank3;
 							break;
 
 						default:
-							bk = player.bank;
+							bk = Player.bank;
 							break;
 					}
 					int no = TestForItem(bk, searchTerm, ref curInv);
@@ -355,8 +355,8 @@ namespace WheresMyItems
 				Chest bktile;
 
 				float dist = (float)Math.Sqrt(Math.Pow(itemSearchRange, 2) / 2);
-				Vector2 start = Gtp(player.Center - new Vector2(dist, dist));
-				Vector2 end = Gtp(player.Center + new Vector2(dist, dist));
+				Vector2 start = Gtp(Player.Center - new Vector2(dist, dist));
+				Vector2 end = Gtp(Player.Center + new Vector2(dist, dist));
 
 				// This deactivating system is used to ensure we don't have several peek boxes drawn for multi-tile banks (since the peek system checks each tile to see if it's a bank and hence draw a peek). It "deactivates" every tile except for the one in the top-left corner.
 				int notiles = NoTile(start, end);
@@ -366,7 +366,7 @@ namespace WheresMyItems
 				{
 					tilePos = GetTile(start, end, j);
 					tile = Main.tile[(int)tilePos.X, (int)tilePos.Y];
-					if (tile.active())
+					if (tile.IsActive)
 					{
 						bool deactivated = false;
 						for (int k = 0; k < nodt; k++)
@@ -389,17 +389,17 @@ namespace WheresMyItems
 						switch (tile.type)
 						{
 							case 29:
-								bktile = player.bank;
+								bktile = Player.bank;
 								tSize = new Vector2(2, 1);
 								DeactTiles(ref nodt, ref deactivatedTiles, deactivated, tilePos, tSize);
 								break;
 							case 97:
-								bktile = player.bank2;
+								bktile = Player.bank2;
 								tSize = new Vector2(2, 2);
 								DeactTiles(ref nodt, ref deactivatedTiles, deactivated, tilePos, tSize);
 								break;
 							case 463:
-								bktile = player.bank3;
+								bktile = Player.bank3;
 								tSize = new Vector2(3, 4);
 								DeactTiles(ref nodt, ref deactivatedTiles, deactivated, tilePos, tSize);
 								break;
@@ -449,7 +449,7 @@ namespace WheresMyItems
 					{
 						for (int j = -tileRange + center.Y; j < tileRange + center.Y; j++)
 						{
-							if (WorldGen.InWorld(i, j) && Main.tile[i, j].active() && Main.tile[i, j].type == WheresMyItems.MagicStorage_TileType_StorageHeart && Main.tile[i, j].frameX == 0 && Main.tile[i, j].frameY == 0)
+							if (WorldGen.InWorld(i, j) && Main.tile[i, j].IsActive && Main.tile[i, j].type == WheresMyItems.MagicStorage_TileType_StorageHeart && Main.tile[i, j].frameX == 0 && Main.tile[i, j].frameY == 0)
 							{
 								//NewDustSlowed(new Vector2(i + 0.5f, j + 0.5f) * 16, 16, 16, 16, 20);
 
