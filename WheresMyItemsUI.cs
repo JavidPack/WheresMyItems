@@ -42,7 +42,7 @@ namespace WheresMyItems
 			searchBarPanel.OnMouseDown += DragStart;
 			searchBarPanel.OnMouseUp += DragEnd;
 
-			Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/UI/Cursor_2");
+			Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/Images/UI/Cursor_2");
 			UIHoverImageButton playButton = new UIHoverImageButton(buttonPlayTexture, "Click to switch peek modes: Show All");
 			playButton.Left.Set(5, 0f);
 			playButton.Top.Set(5, 0f);
