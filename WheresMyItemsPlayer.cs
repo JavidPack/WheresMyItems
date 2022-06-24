@@ -12,7 +12,7 @@ namespace WheresMyItems
 	//draw problems > check position
 	public class WheresMyItemsPlayer : ModPlayer
 	{
-		internal static bool[] waitingOnContents = new bool[1000];
+		internal static bool[] waitingOnContents = new bool[8000];
 		private const int itemSearchRange = 400;
 		private int gameCounter;
 		private Item[] curInv;
@@ -49,7 +49,7 @@ namespace WheresMyItems
 		{
 			int found = 0;
 			Item[] items = c.item;
-			Item[] inv = new Item[3];
+			Item[] inv = new Item[4];
 			for (int i = 0; i < 40; i++)
 			{
 				if (items[i] == null)
@@ -68,7 +68,7 @@ namespace WheresMyItems
 						}
 					}
 					found++;
-					if (found == 3)
+					if (found == 4)
 					{
 						break;
 					}
@@ -81,7 +81,7 @@ namespace WheresMyItems
 		public int TestForItem(IEnumerable<Item> c, string searchTerm, ref Item[] nInv)
 		{
 			int found = 0;
-			Item[] inv = new Item[3];
+			Item[] inv = new Item[4];
 			foreach (Item item in c)
 			{
 				if (item == null)
@@ -100,7 +100,7 @@ namespace WheresMyItems
 						}
 					}
 					found++;
-					if (found == 3)
+					if (found == 4)
 					{
 						break;
 					}
@@ -188,9 +188,9 @@ namespace WheresMyItems
 
 		public void DrawPeeks(Vector2[] peekPos, Texture2D[] itemT, Texture2D box, Item[] inv, int no, int bank)// int bank is only used when you want to draw peeks for the bank icons above the Player's head. Bank has to be -1 for those peeks to be drawn correctly. Otherwise, it can be 1; 
 		{
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 4; i++)
 			{
-				peekPos[i] += new Vector2(0, sc * 24 * (3 - no));
+				peekPos[i] += new Vector2(0, sc * 24 * (4 - no));
 				if (inv[i] != null && !inv[i].IsAir)
 				{
 					itemT[i] = Terraria.GameContent.TextureAssets.Item[inv[i].type].Value;
@@ -213,18 +213,20 @@ namespace WheresMyItems
 				WheresMyItemsUI.worldZoomItems.Clear();
 				WheresMyItemsUI.worldZoomPositions.Clear();
 
-				Texture2D[] bank = new Texture2D[3];
-				Vector2[] pos = new Vector2[3];
+				Texture2D[] bank = new Texture2D[4];
+				Vector2[] pos = new Vector2[4];
 				Texture2D box = Mod.Assets.Request<Texture2D>("box").Value;
 				bank[0] = Terraria.GameContent.TextureAssets.Item[87].Value;
 				bank[1] = Terraria.GameContent.TextureAssets.Item[346].Value;
-				bank[2] = Terraria.GameContent.TextureAssets.Item[3813].Value; ;
+				bank[2] = Terraria.GameContent.TextureAssets.Item[3813].Value;
+				bank[3] = Terraria.GameContent.TextureAssets.Item[4076].Value;
 				Vector2 plTopCenter = Player.position + new Vector2(Player.width / 2, 0f) - Main.screenPosition;
-				pos[0] = plTopCenter + new Vector2(-48, -32);
-				pos[1] = plTopCenter + new Vector2(0, -32);
-				pos[2] = plTopCenter + new Vector2(48, -32);
+				pos[0] = plTopCenter + new Vector2(-72, -32);
+				pos[1] = plTopCenter + new Vector2(-24, -32);
+				pos[2] = plTopCenter + new Vector2(24, -32);
+				pos[3] = plTopCenter + new Vector2(72, -32);
 
-				for (int i = 0; i < 3; i++)
+				for (int i = 0; i < 4; i++)
 				{
 					AddItem(pos[i], bank[i], box, 1f, Color.White, null);
 				}
@@ -238,7 +240,7 @@ namespace WheresMyItems
 				}*/
 				string searchTerm = WheresMyItemsUI.SearchTerm;
 				if (searchTerm.Length == 0) return;
-				for (int chestIndex = 0; chestIndex < 1000; chestIndex++)
+				for (int chestIndex = 0; chestIndex < 8000; chestIndex++)
 				{
 					// If we are waiting on chest contents, skip.
 					if (waitingOnContents[chestIndex])
@@ -274,8 +276,8 @@ namespace WheresMyItems
 								NewDustSlowed(new Vector2(chest.x * 16, chest.y * 16), 32, 32, 16, 10); //107
 																										// draw peek boxes
 								Rectangle chestArea = new Rectangle(chest.x * 16, chest.y * 16, 32, 32);
-								Vector2[] peekPos = new Vector2[3];
-								Texture2D[] itemT = new Texture2D[3];
+								Vector2[] peekPos = new Vector2[4];
+								Texture2D[] itemT = new Texture2D[4];
 								if (hover)
 								{
 									Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
@@ -300,7 +302,7 @@ namespace WheresMyItems
 				}
 				// deal with extra invens
 				Chest bk;
-				for (int bankno = 0; bankno < 3; bankno++)
+				for (int bankno = 0; bankno < 4; bankno++)
 				{
 					switch (bankno)
 					{
@@ -310,6 +312,10 @@ namespace WheresMyItems
 
 						case 2:
 							bk = Player.bank3;
+							break;
+
+						case 3:
+							bk = Player.bank4;
 							break;
 
 						default:
@@ -324,8 +330,8 @@ namespace WheresMyItems
 						pos[bankno].Y -= 16;
 						Vector2 hoverCorner = pos[bankno] + Main.screenPosition;
 						Rectangle chestArea = new Rectangle((int)hoverCorner.X, (int)hoverCorner.Y, 32, 32);
-						Vector2[] peekPos = new Vector2[3];
-						Texture2D[] itemT = new Texture2D[3];
+						Vector2[] peekPos = new Vector2[4];
+						Texture2D[] itemT = new Texture2D[4];
 						if (hover)
 						{
 							Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
@@ -336,14 +342,14 @@ namespace WheresMyItems
 							{
 								continue;
 							}
-							DrawPeeks(peekPos, itemT, box, curInv, no, -1); // pass 3 as "no" so that there's no offset
+							DrawPeeks(peekPos, itemT, box, curInv, no, -1); // pass 4 as "no" so that there's no offset
 						}
 						else
 						{
 							peekPos[0] = chestArea.Center.ToVector2() - Main.screenPosition;
 							peekPos[1] = peekPos[0] - new Vector2(0, 48 * sc);
 							peekPos[2] = peekPos[1] - new Vector2(0, 48 * sc);
-							DrawPeeks(peekPos, itemT, box, curInv, 3, -1); // pass 3 as "no" so that there's no offset
+							DrawPeeks(peekPos, itemT, box, curInv, 4, -1); // pass 4 as "no" so that there's no offset
 						}
 					}
 				}
@@ -403,6 +409,11 @@ namespace WheresMyItems
 								tSize = new Vector2(3, 4);
 								DeactTiles(ref nodt, ref deactivatedTiles, deactivated, tilePos, tSize);
 								break;
+							case 491:
+								bktile = Player.bank4;
+								tSize = new Vector2(3, 4);
+								DeactTiles(ref nodt, ref deactivatedTiles, deactivated, tilePos, tSize);
+								break;
 							default:
 								continue;
 						}
@@ -412,8 +423,8 @@ namespace WheresMyItems
 							// draw peek boxes
 							chestArea = new Rectangle((int)tilePos.X * 16, (int)tilePos.Y * 16, (int)tSize.X * 16, (int)tSize.Y * 16);
 							// chestArea declared above instead since the "chest area" varies for the piggy bank + forge
-							Vector2[] peekPos = new Vector2[3];
-							Texture2D[] itemT = new Texture2D[3];
+							Vector2[] peekPos = new Vector2[4];
+							Texture2D[] itemT = new Texture2D[4];
 							if (hover)
 							{
 								Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
@@ -465,8 +476,8 @@ namespace WheresMyItems
 									NewDustSlowed(new Vector2(i * 16, j * 16), 32, 32, 16, 10); //107
 																											// draw peek boxes
 									Rectangle chestArea = new Rectangle(i * 16, j * 16, 32, 32);
-									Vector2[] peekPos = new Vector2[3];
-									Texture2D[] itemT = new Texture2D[3];
+									Vector2[] peekPos = new Vector2[4];
+									Texture2D[] itemT = new Texture2D[4];
 									if (hover)
 									{
 										Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
