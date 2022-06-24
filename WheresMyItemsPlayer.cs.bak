@@ -366,7 +366,7 @@ namespace WheresMyItems
 				{
 					tilePos = GetTile(start, end, j);
 					tile = Main.tile[(int)tilePos.X, (int)tilePos.Y];
-					if (tile.HasTile)
+					if (tile.IsActive)
 					{
 						bool deactivated = false;
 						for (int k = 0; k < nodt; k++)
@@ -382,11 +382,11 @@ namespace WheresMyItems
 						}
 						Rectangle chestArea = new Rectangle();
 						Vector2 tSize = Vector2.Zero;
-						if (tile.TileFrameX != 0 || tile.TileFrameY != 0) // if we haven't found the top-left corner of the block
+						if (tile.frameX != 0 || tile.frameY != 0) // if we haven't found the top-left corner of the block
 						{
 							continue;
 						}
-						switch (tile.TileType)
+						switch (tile.type)
 						{
 							case 29:
 								bktile = Player.bank;
@@ -449,7 +449,7 @@ namespace WheresMyItems
 					{
 						for (int j = -tileRange + center.Y; j < tileRange + center.Y; j++)
 						{
-							if (WorldGen.InWorld(i, j) && Main.tile[i, j].HasTile && Main.tile[i, j].TileType == WheresMyItems.MagicStorage_TileType_StorageHeart && Main.tile[i, j].TileFrameX == 0 && Main.tile[i, j].TileFrameY == 0)
+							if (WorldGen.InWorld(i, j) && Main.tile[i, j].IsActive && Main.tile[i, j].type == WheresMyItems.MagicStorage_TileType_StorageHeart && Main.tile[i, j].frameX == 0 && Main.tile[i, j].frameY == 0)
 							{
 								//NewDustSlowed(new Vector2(i + 0.5f, j + 0.5f) * 16, 16, 16, 16, 20);
 
