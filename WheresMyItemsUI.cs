@@ -7,8 +7,6 @@ using Terraria.ModLoader;
 using Terraria.UI;
 using System.Collections.Generic;
 using Terraria.DataStructures;
-using ReLogic.Content;
-using Terraria.Audio;
 
 namespace WheresMyItems
 {
@@ -42,7 +40,7 @@ namespace WheresMyItems
 			searchBarPanel.OnMouseDown += DragStart;
 			searchBarPanel.OnMouseUp += DragEnd;
 
-			Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/Images/UI/Cursor_2");
+			Texture2D buttonPlayTexture = ModLoader.GetTexture("Terraria/UI/Cursor_2");
 			UIHoverImageButton playButton = new UIHoverImageButton(buttonPlayTexture, "Click to switch peek modes: Show All");
 			playButton.Left.Set(5, 0f);
 			playButton.Top.Set(5, 0f);
@@ -73,12 +71,12 @@ namespace WheresMyItems
 
 		private void PlayButtonClicked(UIMouseEvent evt, UIElement listeningElement)
 		{
-			SoundEngine.PlaySound(SoundID.MenuOpen);
+			Main.PlaySound(SoundID.MenuOpen);
 		}
 
 		private void CloseButtonClicked(UIMouseEvent evt, UIElement listeningElement)
 		{
-			SoundEngine.PlaySound(SoundID.MenuOpen);
+			Main.PlaySound(SoundID.MenuOpen);
 			visible = false;
 		}
 

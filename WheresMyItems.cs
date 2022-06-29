@@ -8,16 +8,66 @@ using Terraria.UI;
 
 namespace WheresMyItems
 {
+	public class WheresMyItems : Mod
+	{
+		private UserInterface wheresMyItemsUserInterface;
+		internal WheresMyItemsUI wheresMyItemsUI;
+		public static ModHotKey RandomBuffHotKey;
 
-	public class missingStuff : ModSystem
-    {
+		public static Mod MagicStorage;
+		public static int MagicStorage_TileType_StorageHeart;
+		public static MethodInfo MagicStorage_TEStorageHeart_GetStoredItems;
+
+		int lastSeenScreenWidth;
+		int lastSeenScreenHeight;
+
+		public WheresMyItems()
+		{
+		}
+
+		public override void Load()
+		{
+			if (!Main.dedServ)
+			{
+				RandomBuffHotKey = RegisterHotKey("Wheres My Items", "Delete");
+				wheresMyItemsUI = new WheresMyItemsUI();
+				wheresMyItemsUI.Activate();
+				wheresMyItemsUserInterface = new UserInterface();
+				wheresMyItemsUserInterface.SetState(wheresMyItemsUI);
+			}
+			MagicStorage = ModLoader.GetMod("MagicStorage");
+		}
+
+		public override void Unload()
+		{
+			RandomBuffHotKey = null;
+
+			MagicStorage = null; // Do this or MagicStorage won't fully unload.
+			MagicStorage_TileType_StorageHeart = 0;
+			MagicStorage_TEStorageHeart_GetStoredItems = null; // These 2 are for clean code and don't prevent GC 
+		}
+
+		public override void PostSetupContent()
+		{
+			// All Mods have done Load already, so all Tiles have IDs
+			MagicStorage_TileType_StorageHeart = MagicStorage?.TileType("StorageHeart") ?? 0;
+			if(MagicStorage_TileType_StorageHeart > 0)
+			{
+				// Namespace: MagicStorage.Components 
+				// Class: TEStorageHeart
+				// Method: public IEnumerable<Item> GetStoredItems()
+				MagicStorage_TEStorageHeart_GetStoredItems = MagicStorage.GetType().Assembly.GetType("MagicStorage.Components.TEStorageHeart").GetMethod("GetStoredItems", BindingFlags.Instance | BindingFlags.Public);
+			}
+		}
+
 		public override void UpdateUI(GameTime gameTime)
 		{
 			if (WheresMyItemsUI.visible)
-				if (WheresMyItems.wheresMyItemsUserInterface != null)
-					WheresMyItems.wheresMyItemsUserInterface.Update(gameTime);
+				if (wheresMyItemsUserInterface != null)
+					wheresMyItemsUserInterface.Update(gameTime);
 		}
 
+		public static string hoverItemNameBackup;
 		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
 		{
 			int vanillaInventoryLayerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Fancy UI"));
@@ -27,16 +77,16 @@ namespace WheresMyItems
 					"WheresMyItems: Quick Search",
 					delegate
 					{
-						WheresMyItems.hoverItemNameBackup = null;
+						hoverItemNameBackup = null;
 						if (WheresMyItemsUI.visible)
 						{
-							if (WheresMyItems.lastSeenScreenWidth != Main.screenWidth || WheresMyItems.lastSeenScreenHeight != Main.screenHeight)
+							if (lastSeenScreenWidth != Main.screenWidth || lastSeenScreenHeight != Main.screenHeight)
 							{
-								WheresMyItems.wheresMyItemsUserInterface.Recalculate();
-								WheresMyItems.lastSeenScreenWidth = Main.screenWidth;
-								WheresMyItems.lastSeenScreenHeight = Main.screenHeight;
+								wheresMyItemsUserInterface.Recalculate();
+								lastSeenScreenWidth = Main.screenWidth;
+								lastSeenScreenHeight = Main.screenHeight;
 							}
-							WheresMyItems.wheresMyItemsUserInterface.Draw(Main.spriteBatch, new GameTime());
+							wheresMyItemsUserInterface.Draw(Main.spriteBatch, new GameTime());
 						}
 						return true;
 					},
@@ -50,66 +100,13 @@ namespace WheresMyItems
 					"WheresMyItems: Hover Text Logic",
 					delegate
 					{
-						if (!string.IsNullOrEmpty(WheresMyItems.hoverItemNameBackup))
-							Main.hoverItemName = WheresMyItems.hoverItemNameBackup;
+						if (!string.IsNullOrEmpty(hoverItemNameBackup))
+							Main.hoverItemName = hoverItemNameBackup;
 						return true;
 					},
 					InterfaceScaleType.UI)
 				);
 			}
-		}
-	}
-
-
-	public class WheresMyItems : Mod
-	{
-		public static UserInterface wheresMyItemsUserInterface;
-		internal WheresMyItemsUI wheresMyItemsUI;
-		public static ModKeybind RandomBuffHotKey;
-
-		public static Mod MagicStorage;
-		public static int MagicStorage_TileType_StorageHeart;
-		public static MethodInfo MagicStorage_TEStorageHeart_GetStoredItems;
-
-		public static int lastSeenScreenWidth;
-		public static int lastSeenScreenHeight;
-
-		public WheresMyItems()
-		{
-		}
-
-		public override void Load()
-		{
-			if (!Main.dedServ)
-			{
-				RandomBuffHotKey = KeybindLoader.RegisterKeybind(this, "Delete", "Delete");
-				wheresMyItemsUI = new WheresMyItemsUI();
-				wheresMyItemsUI.Activate();
-				wheresMyItemsUserInterface = new UserInterface();
-				wheresMyItemsUserInterface.SetState(wheresMyItemsUI);
-			}
-		}
-
-		public override void Unload()
-		{
-			RandomBuffHotKey = null;
-
-			MagicStorage = null; // Do this or MagicStorage won't fully unload.
-			MagicStorage_TileType_StorageHeart = 0;
-			MagicStorage_TEStorageHeart_GetStoredItems = null; // These 2 are for clean code and don't prevent GC 
-		}
-
-		public void UpdateUI(GameTime gameTime)
-		{
-			var missingStuff = new missingStuff();
-			missingStuff.UpdateUI(gameTime);
-		}
-
-		public static string hoverItemNameBackup;
-		public void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
-		{
-			var missingStuff = new missingStuff();
-			missingStuff.ModifyInterfaceLayers(layers);
 		}
 
 		public override void HandlePacket(BinaryReader reader, int whoAmI)

@@ -2,6 +2,6 @@
 
 Make sure to assign the hotkey in the keybindings menu.
 
-To use, simply press the hotkey and start typing a search term. Chests, Banks (Piggy Bank, Safe, Defenders Forge, Void Vault), and Magic Storage Hearts containing items matching the search term will display a quick peek at up to 3 results. 
+To use, simply press the hotkey and start typing a search term. Chests, Banks (Piggy Bank, Safe, Defenders Forge), and Magic Storage Hearts containing items matching the search term will display a quick peek at up to 3 results. 
 
 Press tab to restore from history the last search term.
