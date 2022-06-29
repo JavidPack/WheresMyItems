@@ -2,5 +2,4 @@ bin
 obj
 *.user
 App.config
-extracode.txt
 /.vs
