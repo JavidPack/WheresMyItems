@@ -8,62 +8,9 @@ using Terraria.UI;
 
 namespace WheresMyItems
 {
-
-	public class missingStuff : ModSystem
-    {
-		public override void UpdateUI(GameTime gameTime)
-		{
-			if (WheresMyItemsUI.visible)
-				if (WheresMyItems.wheresMyItemsUserInterface != null)
-					WheresMyItems.wheresMyItemsUserInterface.Update(gameTime);
-		}
-
-		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
-		{
-			int vanillaInventoryLayerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Fancy UI"));
-			if (vanillaInventoryLayerIndex != -1)
-			{
-				layers.Insert(vanillaInventoryLayerIndex, new LegacyGameInterfaceLayer(
-					"WheresMyItems: Quick Search",
-					delegate
-					{
-						WheresMyItems.hoverItemNameBackup = null;
-						if (WheresMyItemsUI.visible)
-						{
-							if (WheresMyItems.lastSeenScreenWidth != Main.screenWidth || WheresMyItems.lastSeenScreenHeight != Main.screenHeight)
-							{
-								WheresMyItems.wheresMyItemsUserInterface.Recalculate();
-								WheresMyItems.lastSeenScreenWidth = Main.screenWidth;
-								WheresMyItems.lastSeenScreenHeight = Main.screenHeight;
-							}
-							WheresMyItems.wheresMyItemsUserInterface.Draw(Main.spriteBatch, new GameTime());
-						}
-						return true;
-					},
-					InterfaceScaleType.UI)
-				);
-			}
-			int mouseTextLayerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
-			if (mouseTextLayerIndex != -1)
-			{
-				layers.Insert(mouseTextLayerIndex, new LegacyGameInterfaceLayer(
-					"WheresMyItems: Hover Text Logic",
-					delegate
-					{
-						if (!string.IsNullOrEmpty(WheresMyItems.hoverItemNameBackup))
-							Main.hoverItemName = WheresMyItems.hoverItemNameBackup;
-						return true;
-					},
-					InterfaceScaleType.UI)
-				);
-			}
-		}
-	}
-
-
 	public class WheresMyItems : Mod
 	{
-		public static UserInterface wheresMyItemsUserInterface;
+		private UserInterface wheresMyItemsUserInterface;
 		internal WheresMyItemsUI wheresMyItemsUI;
 		public static ModKeybind RandomBuffHotKey;
 
@@ -71,8 +18,8 @@ namespace WheresMyItems
 		public static int MagicStorage_TileType_StorageHeart;
 		public static MethodInfo MagicStorage_TEStorageHeart_GetStoredItems;
 
-		public static int lastSeenScreenWidth;
-		public static int lastSeenScreenHeight;
+		int lastSeenScreenWidth;
+		int lastSeenScreenHeight;
 
 		public WheresMyItems()
 		{
@@ -82,12 +29,13 @@ namespace WheresMyItems
 		{
 			if (!Main.dedServ)
 			{
-				RandomBuffHotKey = KeybindLoader.RegisterKeybind(this, "Delete", "Delete");
+				RandomBuffHotKey = KeybindLoader.RegisterKeybind(this, "Show Search Interface", "Delete");
 				wheresMyItemsUI = new WheresMyItemsUI();
 				wheresMyItemsUI.Activate();
 				wheresMyItemsUserInterface = new UserInterface();
 				wheresMyItemsUserInterface.SetState(wheresMyItemsUI);
 			}
+			ModLoader.TryGetMod("MagicStorage", out MagicStorage);
 		}
 
 		public override void Unload()
@@ -99,17 +47,60 @@ namespace WheresMyItems
 			MagicStorage_TEStorageHeart_GetStoredItems = null; // These 2 are for clean code and don't prevent GC 
 		}
 
-		public void UpdateUI(GameTime gameTime)
-		{
-			var missingStuff = new missingStuff();
-			missingStuff.UpdateUI(gameTime);
+		public override void PostSetupContent() {
+			// All Mods have done Load already, so all Tiles have IDs
+			if(MagicStorage != null) {
+				if(MagicStorage.TryFind<ModTile>("StorageHeart", out ModTile StorageHeart)) {
+					MagicStorage_TileType_StorageHeart = StorageHeart.Type;
+				}
+				if (MagicStorage_TileType_StorageHeart > 0) {
+					// Namespace: MagicStorage.Components 
+					// Class: TEStorageHeart
+					// Method: public IEnumerable<Item> GetStoredItems()
+					MagicStorage_TEStorageHeart_GetStoredItems = MagicStorage.GetType().Assembly.GetType("MagicStorage.Components.TEStorageHeart").GetMethod("GetStoredItems", BindingFlags.Instance | BindingFlags.Public);
+				}
+			}
+		}
+
+		public void UpdateUI(GameTime gameTime) {
+			if (WheresMyItemsUI.visible)
+				if (wheresMyItemsUserInterface != null)
+					wheresMyItemsUserInterface.Update(gameTime);
 		}
 
 		public static string hoverItemNameBackup;
-		public void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
-		{
-			var missingStuff = new missingStuff();
-			missingStuff.ModifyInterfaceLayers(layers);
+		public void ModifyInterfaceLayers(List<GameInterfaceLayer> layers) {
+			int vanillaInventoryLayerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Fancy UI"));
+			if (vanillaInventoryLayerIndex != -1) {
+				layers.Insert(vanillaInventoryLayerIndex, new LegacyGameInterfaceLayer(
+					"WheresMyItems: Quick Search",
+					delegate {
+						hoverItemNameBackup = null;
+						if (WheresMyItemsUI.visible) {
+							if (lastSeenScreenWidth != Main.screenWidth || lastSeenScreenHeight != Main.screenHeight) {
+								wheresMyItemsUserInterface.Recalculate();
+								lastSeenScreenWidth = Main.screenWidth;
+								lastSeenScreenHeight = Main.screenHeight;
+							}
+							wheresMyItemsUserInterface.Draw(Main.spriteBatch, new GameTime());
+						}
+						return true;
+					},
+					InterfaceScaleType.UI)
+				);
+			}
+			int mouseTextLayerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+			if (mouseTextLayerIndex != -1) {
+				layers.Insert(mouseTextLayerIndex, new LegacyGameInterfaceLayer(
+					"WheresMyItems: Hover Text Logic",
+					delegate {
+						if (!string.IsNullOrEmpty(WheresMyItems.hoverItemNameBackup))
+							Main.hoverItemName = WheresMyItems.hoverItemNameBackup;
+						return true;
+					},
+					InterfaceScaleType.UI)
+				);
+			}
 		}
 
 		public override void HandlePacket(BinaryReader reader, int whoAmI)
@@ -145,6 +136,12 @@ namespace WheresMyItems
 					break;
 			}
 		}
+	}
+
+	public class WheresMyItemsSystem : ModSystem {
+		public override void UpdateUI(GameTime gameTime) => ModContent.GetInstance<WheresMyItems>().UpdateUI(gameTime);
+
+		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers) => ModContent.GetInstance<WheresMyItems>().ModifyInterfaceLayers(layers);
 	}
 
 	internal enum MessageType : byte
