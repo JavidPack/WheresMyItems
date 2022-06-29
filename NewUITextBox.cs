@@ -6,6 +6,8 @@ using System;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
+using Terraria.GameContent;
+using Terraria.WorldBuilding;
 
 namespace WheresMyItems
 {
@@ -222,8 +224,8 @@ namespace WheresMyItems
 
 			CalculatedStyle innerDimensions = base.GetInnerDimensions();
 			Vector2 pos = innerDimensions.Position();
-			DynamicSpriteFont spriteFont = base.IsLarge ? Main.fontDeathText : Main.fontMouseText;
-			Vector2 vector = new Vector2(spriteFont.MeasureString(base.Text.Substring(0, this._cursor)).X, base.IsLarge ? 32f : 16f) * base.TextScale;
+			ReLogic.Content.Asset<DynamicSpriteFont> spriteFont = base.IsLarge ? FontAssets.DeathText : FontAssets.MouseText;
+			Vector2 vector = new Vector2(TileFont.MeasureString(base.Text.Substring(0, this._cursor)).X, base.IsLarge ? 32f : 16f) * base.TextScale;
 			if (base.IsLarge)
 			{
 				pos.Y -= 8f * base.TextScale;
@@ -234,7 +236,7 @@ namespace WheresMyItems
 			}
 			if (Text.Length == 0)
 			{
-				Vector2 hintTextSize = new Vector2(spriteFont.MeasureString(hintText.ToString()).X, IsLarge ? 32f : 16f) * TextScale;
+				Vector2 hintTextSize = new Vector2(TileFont.MeasureString(hintText.ToString()).X, IsLarge ? 32f : 16f) * TextScale;
 				pos.X += 5;//(hintTextSize.X);
 				if (base.IsLarge)
 				{

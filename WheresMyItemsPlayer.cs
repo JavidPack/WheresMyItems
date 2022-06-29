@@ -2,17 +2,17 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using Terraria.DataStructures;
+using Terraria;
 
 namespace WheresMyItems
 {
 	//draw problems > check position
 	public class WheresMyItemsPlayer : ModPlayer
 	{
-		internal static bool[] waitingOnContents = new bool[1000];
+		internal static bool[] waitingOnContents = new bool[8000];
 		private const int itemSearchRange = 400;
 		private int gameCounter;
 		private Item[] curInv;
@@ -42,14 +42,14 @@ namespace WheresMyItems
 		public bool ChestWithinRange(Chest c, int range)
 		{
 			Vector2 chestCenter = new Vector2((c.x * 16 + 16), (c.y * 16 + 16));
-			return (chestCenter - player.Center).Length() < range;
+			return (chestCenter - Player.Center).Length() < range;
 		}
 
 		public int TestForItem(Chest c, string searchTerm, ref Item[] nInv)
 		{
 			int found = 0;
 			Item[] items = c.item;
-			Item[] inv = new Item[3];
+			Item[] inv = new Item[4];
 			for (int i = 0; i < 40; i++)
 			{
 				if (items[i] == null)
@@ -68,7 +68,7 @@ namespace WheresMyItems
 						}
 					}
 					found++;
-					if (found == 3)
+					if (found == 4)
 					{
 						break;
 					}
@@ -81,7 +81,7 @@ namespace WheresMyItems
 		public int TestForItem(IEnumerable<Item> c, string searchTerm, ref Item[] nInv)
 		{
 			int found = 0;
-			Item[] inv = new Item[3];
+			Item[] inv = new Item[4];
 			foreach (Item item in c)
 			{
 				if (item == null)
@@ -100,7 +100,7 @@ namespace WheresMyItems
 						}
 					}
 					found++;
-					if (found == 3)
+					if (found == 4)
 					{
 						break;
 					}
@@ -186,23 +186,23 @@ namespace WheresMyItems
 			WheresMyItemsUI.worldZoomPositions.Add(pos - 1.25f * HalfSize(box, scale));
 		}
 
-		public void DrawPeeks(Vector2[] peekPos, Texture2D[] itemT, Texture2D box, Item[] inv, int no, int bank)// int bank is only used when you want to draw peeks for the bank icons above the player's head. Bank has to be -1 for those peeks to be drawn correctly. Otherwise, it can be 1; 
+		public void DrawPeeks(Vector2[] peekPos, Texture2D[] itemT, Texture2D box, Item[] inv, int no, int bank)// int bank is only used when you want to draw peeks for the bank icons above the Player's head. Bank has to be -1 for those peeks to be drawn correctly. Otherwise, it can be 1; 
 		{
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 4; i++)
 			{
-				peekPos[i] += new Vector2(0, sc * 24 * (3 - no));
+				peekPos[i] += new Vector2(0, sc * 24 * (4 - no));
 				if (inv[i] != null && !inv[i].IsAir)
 				{
-					itemT[i] = Main.itemTexture[inv[i].type];
+					itemT[i] = Terraria.GameContent.TextureAssets.Item[inv[i].type].Value;
 					AddItem(peekPos[i], itemT[i], box, sc, Color.Red, inv[i]);
 				}
 			}
 		}
 
 
-		public override void DrawEffects(PlayerDrawInfo drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
+		public override void DrawEffects(Terraria.DataStructures.PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
 		{
-			if (WheresMyItemsUI.visible && player == Main.LocalPlayer)
+			if (WheresMyItemsUI.visible && Player == Main.LocalPlayer)
 			{
 				gameCounter++;
 				if (gameCounter == 99999)
@@ -213,23 +213,25 @@ namespace WheresMyItems
 				WheresMyItemsUI.worldZoomItems.Clear();
 				WheresMyItemsUI.worldZoomPositions.Clear();
 
-				Texture2D[] bank = new Texture2D[3];
-				Vector2[] pos = new Vector2[3];
-				Texture2D box = mod.GetTexture("box");
-				bank[0] = Main.itemTexture[87];
-				bank[1] = Main.itemTexture[346];
-				bank[2] = Main.itemTexture[3813]; ;
-				Vector2 plTopCenter = player.position + new Vector2(player.width / 2, 0f) - Main.screenPosition;
-				pos[0] = plTopCenter + new Vector2(-48, -32);
-				pos[1] = plTopCenter + new Vector2(0, -32);
-				pos[2] = plTopCenter + new Vector2(48, -32);
+				Texture2D[] bank = new Texture2D[4];
+				Vector2[] pos = new Vector2[4];
+				Texture2D box = Mod.Assets.Request<Texture2D>("box").Value;
+				bank[0] = Terraria.GameContent.TextureAssets.Item[87].Value;
+				bank[1] = Terraria.GameContent.TextureAssets.Item[346].Value;
+				bank[2] = Terraria.GameContent.TextureAssets.Item[3813].Value;
+				bank[3] = Terraria.GameContent.TextureAssets.Item[4076].Value;
+				Vector2 plTopCenter = Player.position + new Vector2(Player.width / 2, 0f) - Main.screenPosition;
+				pos[0] = plTopCenter + new Vector2(-72, -32);
+				pos[1] = plTopCenter + new Vector2(-24, -32);
+				pos[2] = plTopCenter + new Vector2(24, -32);
+				pos[3] = plTopCenter + new Vector2(72, -32);
 
-				for (int i = 0; i < 3; i++)
+				for (int i = 0; i < 4; i++)
 				{
 					AddItem(pos[i], bank[i], box, 1f, Color.White, null);
 				}
-				//Main.NewText(Main.player[Main.myPlayer].chest.ToString());
-				/*if (player.townNPCs < 1f)
+				//Main.NewText(Main.Player[Main.myPlayer].chest.ToString());
+				/*if (Player.townNPCs < 1f)
 				{
 					WheresMyItemsUI.box.SetText("");
 					WheresMyItemsUI.box.Unfocus();
@@ -238,7 +240,7 @@ namespace WheresMyItems
 				}*/
 				string searchTerm = WheresMyItemsUI.SearchTerm;
 				if (searchTerm.Length == 0) return;
-				for (int chestIndex = 0; chestIndex < 1000; chestIndex++)
+				for (int chestIndex = 0; chestIndex < 8000; chestIndex++)
 				{
 					// If we are waiting on chest contents, skip.
 					if (waitingOnContents[chestIndex])
@@ -246,13 +248,13 @@ namespace WheresMyItems
 						continue;
 					}
 					Chest chest = Main.chest[chestIndex];
-					if (chest != null && /*!Chest.IsPlayerInChest(i) &&*/ !Chest.isLocked(chest.x, chest.y))
+					if (chest != null && /*!Chest.IsPlayerInChest(i) &&*/ !Chest.IsLocked(chest.x, chest.y))
 					{
 						if (ChestWithinRange(chest, itemSearchRange))
 						{
 							if (chest.item[0] == null)
 							{
-								var message = mod.GetPacket();
+								var message = Mod.GetPacket();
 								message.Write((byte)MessageType.SilentRequestChestContents);
 								message.Write(chestIndex);
 								message.Send();
@@ -274,8 +276,8 @@ namespace WheresMyItems
 								NewDustSlowed(new Vector2(chest.x * 16, chest.y * 16), 32, 32, 16, 10); //107
 																										// draw peek boxes
 								Rectangle chestArea = new Rectangle(chest.x * 16, chest.y * 16, 32, 32);
-								Vector2[] peekPos = new Vector2[3];
-								Texture2D[] itemT = new Texture2D[3];
+								Vector2[] peekPos = new Vector2[4];
+								Texture2D[] itemT = new Texture2D[4];
 								if (hover)
 								{
 									Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
@@ -300,20 +302,24 @@ namespace WheresMyItems
 				}
 				// deal with extra invens
 				Chest bk;
-				for (int bankno = 0; bankno < 3; bankno++)
+				for (int bankno = 0; bankno < 4; bankno++)
 				{
 					switch (bankno)
 					{
 						case 1:
-							bk = player.bank2;
+							bk = Player.bank2;
 							break;
 
 						case 2:
-							bk = player.bank3;
+							bk = Player.bank3;
+							break;
+
+						case 3:
+							bk = Player.bank4;
 							break;
 
 						default:
-							bk = player.bank;
+							bk = Player.bank;
 							break;
 					}
 					int no = TestForItem(bk, searchTerm, ref curInv);
@@ -324,8 +330,8 @@ namespace WheresMyItems
 						pos[bankno].Y -= 16;
 						Vector2 hoverCorner = pos[bankno] + Main.screenPosition;
 						Rectangle chestArea = new Rectangle((int)hoverCorner.X, (int)hoverCorner.Y, 32, 32);
-						Vector2[] peekPos = new Vector2[3];
-						Texture2D[] itemT = new Texture2D[3];
+						Vector2[] peekPos = new Vector2[4];
+						Texture2D[] itemT = new Texture2D[4];
 						if (hover)
 						{
 							Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
@@ -336,14 +342,14 @@ namespace WheresMyItems
 							{
 								continue;
 							}
-							DrawPeeks(peekPos, itemT, box, curInv, no, -1); // pass 3 as "no" so that there's no offset
+							DrawPeeks(peekPos, itemT, box, curInv, no, -1); // pass 4 as "no" so that there's no offset
 						}
 						else
 						{
 							peekPos[0] = chestArea.Center.ToVector2() - Main.screenPosition;
 							peekPos[1] = peekPos[0] - new Vector2(0, 48 * sc);
 							peekPos[2] = peekPos[1] - new Vector2(0, 48 * sc);
-							DrawPeeks(peekPos, itemT, box, curInv, 3, -1); // pass 3 as "no" so that there's no offset
+							DrawPeeks(peekPos, itemT, box, curInv, 4, -1); // pass 4 as "no" so that there's no offset
 						}
 					}
 				}
@@ -355,8 +361,8 @@ namespace WheresMyItems
 				Chest bktile;
 
 				float dist = (float)Math.Sqrt(Math.Pow(itemSearchRange, 2) / 2);
-				Vector2 start = Gtp(player.Center - new Vector2(dist, dist));
-				Vector2 end = Gtp(player.Center + new Vector2(dist, dist));
+				Vector2 start = Gtp(Player.Center - new Vector2(dist, dist));
+				Vector2 end = Gtp(Player.Center + new Vector2(dist, dist));
 
 				// This deactivating system is used to ensure we don't have several peek boxes drawn for multi-tile banks (since the peek system checks each tile to see if it's a bank and hence draw a peek). It "deactivates" every tile except for the one in the top-left corner.
 				int notiles = NoTile(start, end);
@@ -366,7 +372,7 @@ namespace WheresMyItems
 				{
 					tilePos = GetTile(start, end, j);
 					tile = Main.tile[(int)tilePos.X, (int)tilePos.Y];
-					if (tile.active())
+					if (tile.HasTile)
 					{
 						bool deactivated = false;
 						for (int k = 0; k < nodt; k++)
@@ -382,24 +388,29 @@ namespace WheresMyItems
 						}
 						Rectangle chestArea = new Rectangle();
 						Vector2 tSize = Vector2.Zero;
-						if (tile.frameX != 0 || tile.frameY != 0) // if we haven't found the top-left corner of the block
+						if (tile.TileFrameX != 0 || tile.TileFrameY != 0) // if we haven't found the top-left corner of the block
 						{
 							continue;
 						}
-						switch (tile.type)
+						switch (tile.TileType)
 						{
 							case 29:
-								bktile = player.bank;
+								bktile = Player.bank;
 								tSize = new Vector2(2, 1);
 								DeactTiles(ref nodt, ref deactivatedTiles, deactivated, tilePos, tSize);
 								break;
 							case 97:
-								bktile = player.bank2;
+								bktile = Player.bank2;
 								tSize = new Vector2(2, 2);
 								DeactTiles(ref nodt, ref deactivatedTiles, deactivated, tilePos, tSize);
 								break;
 							case 463:
-								bktile = player.bank3;
+								bktile = Player.bank3;
+								tSize = new Vector2(3, 4);
+								DeactTiles(ref nodt, ref deactivatedTiles, deactivated, tilePos, tSize);
+								break;
+							case 491:
+								bktile = Player.bank4;
 								tSize = new Vector2(3, 4);
 								DeactTiles(ref nodt, ref deactivatedTiles, deactivated, tilePos, tSize);
 								break;
@@ -412,8 +423,8 @@ namespace WheresMyItems
 							// draw peek boxes
 							chestArea = new Rectangle((int)tilePos.X * 16, (int)tilePos.Y * 16, (int)tSize.X * 16, (int)tSize.Y * 16);
 							// chestArea declared above instead since the "chest area" varies for the piggy bank + forge
-							Vector2[] peekPos = new Vector2[3];
-							Texture2D[] itemT = new Texture2D[3];
+							Vector2[] peekPos = new Vector2[4];
+							Texture2D[] itemT = new Texture2D[4];
 							if (hover)
 							{
 								Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
@@ -449,7 +460,7 @@ namespace WheresMyItems
 					{
 						for (int j = -tileRange + center.Y; j < tileRange + center.Y; j++)
 						{
-							if (WorldGen.InWorld(i, j) && Main.tile[i, j].active() && Main.tile[i, j].type == WheresMyItems.MagicStorage_TileType_StorageHeart && Main.tile[i, j].frameX == 0 && Main.tile[i, j].frameY == 0)
+							if (WorldGen.InWorld(i, j) && Main.tile[i, j].HasTile && Main.tile[i, j].TileType == WheresMyItems.MagicStorage_TileType_StorageHeart && Main.tile[i, j].TileFrameX == 0 && Main.tile[i, j].TileFrameY == 0)
 							{
 								//NewDustSlowed(new Vector2(i + 0.5f, j + 0.5f) * 16, 16, 16, 16, 20);
 
@@ -465,8 +476,8 @@ namespace WheresMyItems
 									NewDustSlowed(new Vector2(i * 16, j * 16), 32, 32, 16, 10); //107
 																											// draw peek boxes
 									Rectangle chestArea = new Rectangle(i * 16, j * 16, 32, 32);
-									Vector2[] peekPos = new Vector2[3];
-									Texture2D[] itemT = new Texture2D[3];
+									Vector2[] peekPos = new Vector2[4];
+									Texture2D[] itemT = new Texture2D[4];
 									if (hover)
 									{
 										Vector2 mousePosition = new Vector2(Main.mouseX, Main.mouseY) + Main.screenPosition;
