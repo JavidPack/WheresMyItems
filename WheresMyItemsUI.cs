@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Terraria.DataStructures;
 using ReLogic.Content;
 using Terraria.Audio;
+using Terraria.Localization;
 
 namespace WheresMyItems
 {
@@ -39,17 +40,17 @@ namespace WheresMyItems
 			searchBarPanel.Width.Set(170f, 0f);
 			searchBarPanel.Height.Set(30f, 0f);
 			searchBarPanel.BackgroundColor = new Color(73, 94, 171);
-			searchBarPanel.OnMouseDown += DragStart;
-			searchBarPanel.OnMouseUp += DragEnd;
+			searchBarPanel.OnLeftMouseDown += DragStart;
+			searchBarPanel.OnLeftMouseUp += DragEnd;
 
 			Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/Images/UI/Cursor_2");
-			UIHoverImageButton playButton = new UIHoverImageButton(buttonPlayTexture, "Click to switch peek modes: Show All");
+			UIHoverImageButton playButton = new UIHoverImageButton(buttonPlayTexture, Language.GetText(WheresMyItems.instance.GetLocalizationKey("ClickToSwitchPeekMode")).Format(Language.GetText(WheresMyItems.instance.GetLocalizationKey("ShowAll"))));
 			playButton.Left.Set(5, 0f);
 			playButton.Top.Set(5, 0f);
-			playButton.OnClick += TogHover;
+			playButton.OnLeftClick += TogHover;
 			searchBarPanel.Append(playButton);
 
-			box = new NewUITextBox("Type here to search", 0.78f);
+			box = new NewUITextBox(Language.GetTextValue(WheresMyItems.instance.GetLocalizationKey("TypeHereToSearch")), 0.78f);
 			box.OnTabPressed += () => 
 			{
 				if (!string.IsNullOrEmpty(history))
@@ -108,7 +109,7 @@ namespace WheresMyItems
 		{
 			UIHoverImageButton button = (evt.Target as UIHoverImageButton);
 			WheresMyItemsPlayer.hover = !WheresMyItemsPlayer.hover;
-			button.hoverText = "Click to switch peek modes: Show " + (WheresMyItemsPlayer.hover ? "Hovered" : "All");
+			button.hoverText = Language.GetText(WheresMyItems.instance.GetLocalizationKey("ClickToSwitchPeekMode")).Format(Language.GetText(WheresMyItems.instance.GetLocalizationKey(WheresMyItemsPlayer.hover ? "ShowHovered" : "ShowAll")));
 		}
 
 		protected override void DrawSelf(SpriteBatch spriteBatch)

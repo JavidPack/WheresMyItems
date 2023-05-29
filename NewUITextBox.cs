@@ -32,10 +32,10 @@ namespace WheresMyItems
 			//	keyBoardInput.newKeyEvent += KeyboardInput_newKeyEvent;
 		}
 
-		public override void Click(UIMouseEvent evt)
+		public override void LeftClick(UIMouseEvent evt)
 		{
 			Focus();
-			base.Click(evt);
+			base.LeftClick(evt);
 		}
 
 		private void KeyboardInput_newKeyEvent(char obj)

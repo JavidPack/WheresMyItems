@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
+using Terraria.ID;
+using Terraria.ModLoader.Core;
 
 namespace WheresMyItems
 {
@@ -14,6 +16,7 @@ namespace WheresMyItems
 		internal WheresMyItemsUI wheresMyItemsUI;
 		public static ModKeybind RandomBuffHotKey;
 
+		public static WheresMyItems instance;
 		public static Mod MagicStorage;
 		public static int MagicStorage_TileType_StorageHeart;
 		public static MethodInfo MagicStorage_TEStorageHeart_GetStoredItems;
@@ -27,14 +30,8 @@ namespace WheresMyItems
 
 		public override void Load()
 		{
-			if (!Main.dedServ)
-			{
-				RandomBuffHotKey = KeybindLoader.RegisterKeybind(this, "Show Search Interface", "Delete");
-				wheresMyItemsUI = new WheresMyItemsUI();
-				wheresMyItemsUI.Activate();
-				wheresMyItemsUserInterface = new UserInterface();
-				wheresMyItemsUserInterface.SetState(wheresMyItemsUI);
-			}
+			instance = this;
+			RandomBuffHotKey = KeybindLoader.RegisterKeybind(this, "ShowSearchInterface", "Delete");
 			ModLoader.TryGetMod("MagicStorage", out MagicStorage);
 		}
 
@@ -42,14 +39,22 @@ namespace WheresMyItems
 		{
 			RandomBuffHotKey = null;
 
+			instance = null;
 			MagicStorage = null; // Do this or MagicStorage won't fully unload.
 			MagicStorage_TileType_StorageHeart = 0;
 			MagicStorage_TEStorageHeart_GetStoredItems = null; // These 2 are for clean code and don't prevent GC 
 		}
 
 		public override void PostSetupContent() {
+			if (!Main.dedServ) {
+				wheresMyItemsUI = new WheresMyItemsUI();
+				wheresMyItemsUI.Activate();
+				wheresMyItemsUserInterface = new UserInterface();
+				wheresMyItemsUserInterface.SetState(wheresMyItemsUI);
+			}
+
 			// All Mods have done Load already, so all Tiles have IDs
-			if(MagicStorage != null) {
+			if (MagicStorage != null) {
 				if(MagicStorage.TryFind<ModTile>("StorageHeart", out ModTile StorageHeart)) {
 					MagicStorage_TileType_StorageHeart = StorageHeart.Type;
 				}
@@ -57,6 +62,7 @@ namespace WheresMyItems
 					// Namespace: MagicStorage.Components 
 					// Class: TEStorageHeart
 					// Method: public IEnumerable<Item> GetStoredItems()
+					// TODO: might need AssemblyManager.GetLoadableTypes(assembly) once MagicStorage updates?
 					MagicStorage_TEStorageHeart_GetStoredItems = MagicStorage.GetType().Assembly.GetType("MagicStorage.Components.TEStorageHeart").GetMethod("GetStoredItems", BindingFlags.Instance | BindingFlags.Public);
 				}
 			}
@@ -115,7 +121,7 @@ namespace WheresMyItems
 					{
 						for (int i = 0; i < 40; i++)
 						{
-							NetMessage.SendData(32, whoAmI, -1, null, chestIndex, (float)i, 0f, 0f, 0, 0, 0);
+							NetMessage.SendData(MessageID.SyncChestItem, whoAmI, -1, null, chestIndex, (float)i, 0f, 0f, 0, 0, 0);
 						}
 						var message = GetPacket();
 						message.Write((byte)MessageType.SilentSendChestContentsComplete);

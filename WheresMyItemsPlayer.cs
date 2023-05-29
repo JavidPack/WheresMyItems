@@ -6,6 +6,7 @@ using Terraria.GameInput;
 using Terraria.ModLoader;
 using Terraria.DataStructures;
 using Terraria;
+using Terraria.ID;
 
 namespace WheresMyItems
 {
@@ -216,10 +217,14 @@ namespace WheresMyItems
 				Texture2D[] bank = new Texture2D[4];
 				Vector2[] pos = new Vector2[4];
 				Texture2D box = Mod.Assets.Request<Texture2D>("box").Value;
-				bank[0] = Terraria.GameContent.TextureAssets.Item[87].Value;
-				bank[1] = Terraria.GameContent.TextureAssets.Item[346].Value;
-				bank[2] = Terraria.GameContent.TextureAssets.Item[3813].Value;
-				bank[3] = Terraria.GameContent.TextureAssets.Item[4076].Value;
+				Main.instance.LoadItem(ItemID.PiggyBank);
+				Main.instance.LoadItem(ItemID.Safe);
+				Main.instance.LoadItem(ItemID.DefendersForge);
+				Main.instance.LoadItem(ItemID.VoidVault);
+				bank[0] = Terraria.GameContent.TextureAssets.Item[ItemID.PiggyBank].Value;
+				bank[1] = Terraria.GameContent.TextureAssets.Item[ItemID.Safe].Value;
+				bank[2] = Terraria.GameContent.TextureAssets.Item[ItemID.DefendersForge].Value;
+				bank[3] = Terraria.GameContent.TextureAssets.Item[ItemID.VoidVault].Value;
 				Vector2 plTopCenter = Player.position + new Vector2(Player.width / 2, 0f) - Main.screenPosition;
 				pos[0] = plTopCenter + new Vector2(-72, -32);
 				pos[1] = plTopCenter + new Vector2(-24, -32);

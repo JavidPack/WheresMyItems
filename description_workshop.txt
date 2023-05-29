@@ -1,0 +1,17 @@
+﻿[img]https://i.imgur.com/W2c5CX6.gif[/img]
+
+[h1]Overview[/h1]
+Adds a method to locate items in chests easily. Press the hotkey and then start typing to find items in chests.
+
+Make sure to assign the hotkey in the keybindings menu.
+
+To use, simply press the hotkey and start typing a search term. Chests, Banks (Piggy Bank, Safe, Defenders Forge, Void Vault), and Magic Storage Hearts containing items matching the search term will display a quick peek at up to 3 results. 
+
+Press tab to restore from history the last search term.
+
+[h1]Links[/h1]
+Source code hosted on [url=github.com/JavidPack/WheresMyItems]GitHub[/url], collaboration welcome
+For questions or suggestions, come to my Discord: [url=discord.gg/w8Hcwby][img]https://discordapp.com/api/guilds/276235094622994433/widget.png?style=shield[/img][/url]
+Bug reports in the comments here will not be seen, come to Discord or Github to report issues.
+If you'd like to support my mods, I have a Patreon [url=www.patreon.com/jopojelly][img]https://i.imgur.com/xII2DwJ.png[/img][/url]
+[url=https://steamcommunity.com/profiles/76561198025715866/myworkshopfiles/?appid=1281930]Check out all my mods[/url]
