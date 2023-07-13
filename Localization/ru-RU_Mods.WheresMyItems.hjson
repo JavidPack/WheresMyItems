@@ -1,5 +1,5 @@
-// Keybinds.ShowSearchInterface.DisplayName: Show Search Interface
-// ClickToSwitchPeekMode: Click to switch peek modes: {0}
-// ShowHovered: Show Hovered
-// ShowAll: Show All
-// TypeHereToSearch: Type here to search
+Keybinds.ShowSearchInterface.DisplayName: Показать интерфейс поиска
+ClickToSwitchPeekMode: Нажмите, чтобы переключить режимы просмотра: {0}
+ShowHovered: Показывать предмет при наведении курсора на хранилище
+ShowAll: Показывать предмет без наведения курсора на хранилище
+TypeHereToSearch: Введите здесь для поиска
