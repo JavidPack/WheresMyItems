@@ -1,0 +1,9 @@
+en-US, 5/5, 100%, missing 0
+de-DE, 0/5, 0%, missing 5
+it-IT, 0/5, 0%, missing 5
+fr-FR, 0/5, 0%, missing 5
+es-ES, 0/5, 0%, missing 5
+ru-RU, 5/5, 100%, missing 0
+zh-Hans, 0/5, 0%, missing 5
+pt-BR, 0/5, 0%, missing 5
+pl-PL, 0/5, 0%, missing 5
