@@ -3,3 +3,18 @@ ClickToSwitchPeekMode: Click to switch peek modes: {0}
 ShowHovered: Show Hovered
 ShowAll: Show All
 TypeHereToSearch: Type here to search
+
+Configs: {
+	ServerConfig: {
+		DisplayName: Server Config
+
+		ChestSearchRange: {
+			Label: Chest Search Range
+			Tooltip:
+				'''
+				Adjust if you want to search chests farther away
+				Default value (60) should work for all chests on screen at 100% game zoom
+				'''
+		}
+	}
+}

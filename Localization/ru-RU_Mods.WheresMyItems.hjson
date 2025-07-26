@@ -3,3 +3,18 @@ ClickToSwitchPeekMode: Нажмите, чтобы переключить реж�
 ShowHovered: Показывать предмет при наведении курсора на хранилище
 ShowAll: Показывать предмет без наведения курсора на хранилище
 TypeHereToSearch: Введите здесь для поиска
+
+Configs: {
+	ServerConfig: {
+		// DisplayName: Server Config
+
+		ChestSearchRange: {
+			// Label: Chest Search Range
+			/* Tooltip:
+				'''
+				Adjust if you want to search chests farther away
+				Default value (60) should work for all chests on screen at 100% game zoom
+				''' */
+		}
+	}
+}

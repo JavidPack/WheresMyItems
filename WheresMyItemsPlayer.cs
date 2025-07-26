@@ -14,7 +14,8 @@ namespace WheresMyItems
 	public class WheresMyItemsPlayer : ModPlayer
 	{
 		internal static bool[] waitingOnContents = new bool[8000];
-		private const int itemSearchRange = 400;
+		//private const int itemSearchRange = 400;
+		private int itemSearchRange => ServerConfig.Instance.ChestSearchRange * 16;
 		private int gameCounter;
 		private Item[] curInv;
 		private float sc = 0.8f;
