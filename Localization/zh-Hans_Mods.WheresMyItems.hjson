@@ -1,20 +1,20 @@
-// Keybinds.ShowSearchInterface.DisplayName: Show Search Interface
-// ClickToSwitchPeekMode: Click to switch peek modes: {0}
-// ShowHovered: Show Hovered
-// ShowAll: Show All
-// TypeHereToSearch: Type here to search
+Keybinds.ShowSearchInterface.DisplayName: 显示搜索界面
+ClickToSwitchPeekMode: 点击切换显示模式 {0}
+ShowHovered: 显示鼠标悬停的物品
+ShowAll: 显示全部
+TypeHereToSearch: 输入以搜索
 
 Configs: {
 	ServerConfig: {
-		// DisplayName: Server Config
+		DisplayName: 服务器配置
 
 		ChestSearchRange: {
-			// Label: Chest Search Range
-			/* Tooltip:
+			Label: 箱子搜索范围
+			Tooltip:
 				'''
-				Adjust if you want to search chests farther away
-				Default value (60) should work for all chests on screen at 100% game zoom
-				''' */
+				如果希望搜索更远处的箱子，可以调整此数值
+				默认值(60)在游戏缩放比例为 100% 时应能覆盖屏幕内的所有箱子
+				'''
 		}
 	}
 }
